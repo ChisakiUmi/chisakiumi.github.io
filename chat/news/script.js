@@ -60,7 +60,7 @@ filterButtons.forEach(button => {
 });
 
 function filterNewsByCategory(category) {
-    fetch('http://localhost:3000/api/news')
+    fetch('https://backend-oik0.onrender.com/api/news')
         .then(res => res.json())
         .then(data => {
             const currentDate = new Date();
@@ -121,7 +121,7 @@ function loadNews() {
     const currentDate = new Date();
 
     // Lấy dữ liệu tin tức từ server
-    fetch('http://localhost:3000/api/news')
+    fetch('https://backend-oik0.onrender.com/api/news')
         .then(response => response.json())
         .then(data => {
             // Lọc các bài viết đã quá 3 ngày
@@ -222,7 +222,7 @@ newsForm.addEventListener('submit', function(e) {
     selectedFiles.forEach(file => formData.append('images', file));
 
     // Gửi dữ liệu đến backend
-    fetch('http://localhost:3000/api/news', {
+    fetch('https://backend-oik0.onrender.com/api/news', {
         method: 'POST',
         body: formData
     })

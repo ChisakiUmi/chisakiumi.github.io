@@ -9,6 +9,7 @@ const commands = [
   "    mov     rax, 60         ; sys_exit",
   "    xor     rdi, rdi",
   "    syscall",
+  "    author: MN + Asu",
   "section .data",
   "    msg1 db \"Hãy cẩn trọng khi sử dụng.\", 10, 0",
   "    len1 equ $ - msg1",
