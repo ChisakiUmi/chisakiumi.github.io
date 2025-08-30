@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="add-button">
+        <i class="fas fa-plus"></i>
+    </div>
+    <div class="main-content">
+        <div class="news-container">
+            <div class="post-news">
+                <h2>Đăng tin tức mới</h2>
+                <form class="post-form" id="newsForm">
+                    <input type="text" id="newsTitle" placeholder="Tiêu đề tin tức" required>
+                    <textarea id="newsContent" placeholder="Nội dung tin tức" required></textarea>
+                    <input type="file" id="newsImage" accept="image/*" multiple class="custom-file-input">
+                    <div class="media-preview" id="mediaPreview"></div>
+                    <button type="submit">Đăng tin</button>
+                    <input type="text" id="newsAuthor" placeholder="Tên người đăng (để trống = Anonymous)">
+                    <select id="newsCategory" required>
+                        <option value="">Chọn thể loại</option>
+                        <option value="anime/manga">Anime/Manga</option>
+                        <option value="news">News</option>
+                        <option value="bốc phốt">Bốc phốt</option>
+                        <option value="game">Game</option>
+                        <option value="music">Music</option>
+                        <option value="ask">Ask</option>
+                        <option value="pass đồ">Pass đồ</option>
+                        <option value="giải thích">Giải thích</option>
+                    </select>
+
+                </form>
+            </div>
+
+            <div class="search-filter-container">
+                <div class="search-container">
+                    <input type="text" class="search-bar" placeholder="Tìm kiếm tin tức...">
+                    <button class="filter-toggle">
+                        <i class="fas fa-filter"></i>
+                    </button>
+                </div>
+                <div class="filter-section" style="display: none;">
+                    <button class="filter-button active">Tất cả</button>
+                    <button class="filter-button">Anime/Manga</button>
+                    <button class="filter-button">News</button>
+                    <button class="filter-button">Bốc phốt</button>
+                    <button class="filter-button">Game</button>
+                    <button class="filter-button">Music</button>
+                    <button class="filter-button">Ask</button>
+                    <button class="filter-button">Pass đồ</button>
+                    <button class="filter-button">Giải thích</button>
+                </div>
+            </div>
+
+            <div class="news-list" id="newsList">
+                <!-- Tin tức sẽ được thêm vào đây bằng JavaScript -->
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

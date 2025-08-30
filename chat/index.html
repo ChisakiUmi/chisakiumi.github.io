@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghi Chú Ẩn Danh</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+</head>
+<body>
+    <div class="sidebar">
+        <h3>Menu</h3>
+        <a href="news/index.html"><i class="fas fa-newspaper"></i></a>
+        <a href="img/index.html"><i class="fas fa-images"></i></a>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+            <h1>Gửi tâm tư của bạn</h1>
+            <p>Bộc lộ bản chất của bạn một cách ẩn danh!</p>
+            <div class="notes-display">
+                <div class="note-content">
+                    <!-- Các ghi chú sẽ được hiển thị ở đây -->
+                </div>
+            </div>
+            <div class="input-area">
+                <div class="media-preview" id="media-preview"></div>
+                <div class="input-wrapper">
+                    <div class="media-buttons">
+                        <label for="image-input" class="media-btn">
+                            <i class="fas fa-image"></i>
+                            <input type="file" id="image-input" accept="image/*" multiple style="display: none;">
+                        </label>
+                        <label for="video-input" class="media-btn">
+                            <i class="fas fa-video"></i>
+                            <input type="file" id="video-input" accept="video/*" multiple style="display: none;">
+                        </label>
+                        <button class="emoji-toggle" id="emoji-toggle">
+                            <i class="far fa-smile"></i>
+                        </button>
+                        <div class="emoji-picker" id="emoji-picker"></div>
+                    </div>
+                    <textarea id="note-input" placeholder="Viết ghi chú của bạn ở đây..."></textarea>
+                    <button class="send-button" id="submit-note">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bọc music-player và các panel trong một container chung -->
+    <div class="player-container">
+        <div class="music-player">
+            <div class="user-info">
+                <input type="file" id="avatar-input" accept="image/*" style="display: none;">
+                <div class="avatar-wrapper">
+                    <img src="avatar.jpg" alt="Avatar" class="avatar" id="avatar">
+                    <div class="avatar-placeholder" id="avatar-placeholder">
+                        Avatar
+                    </div>
+                </div>
+                <div class="user-details">
+                    <input type="text" class="edit-input" id="username" value="Tên Người Dùng" />
+                    <span class="song-title" id="song-title">Bài Hát</span>
+                </div>
+                <button class="play-button" id="play-button"><i class="fas fa-play"></i></button>
+            </div>
+            <div class="controls">
+                <button class="control-button" id="prev-button"><i class="fas fa-backward"></i></button>
+                <span class="time-display" id="current-time">0:00</span>
+                <input type="range" class="seek-bar" value="0" min="0" max="100">
+                <span class="time-display" id="total-time">0:00</span>
+                <button class="control-button" id="next-button"><i class="fas fa-forward"></i></button>
+            </div>
+            <div class="icons">
+                <div class="search-container">
+                    <button class="search-icon" title="Tìm kiếm" id="search-toggle"><i class="fas fa-search"></i></button>
+                </div>
+                <div class="settings-container">
+                    <button class="settings-icon" title="Tùy chỉnh" id="settings-toggle"><i class="fas fa-ellipsis-v"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- search-box và settings-panel được đặt ở đây, bên trong player-container -->
+        <div class="search-box" id="search-box">
+            <input type="text" placeholder="Tìm kiếm bài hát..." id="search-input">
+            <div class="song-suggestions" id="song-suggestions"></div>
+        </div>
+
+        <div class="settings-panel" id="settings-panel">
+            <div class="settings-section">
+                <span class="settings-title">Màu sắc chủ đạo</span>
+                <div class="color-picker">
+                    <div class="color-option selected" style="background: var(--primary-color);" data-color="--primary-color"></div>
+                    <div class="color-option" style="background: var(--secondary-color);" data-color="--secondary-color"></div>
+                    <div class="color-option" style="background: #ff66c4;" data-color="#ff66c4"></div>
+                    <div class="color-option" style="background: var(--success-color);" data-color="--success-color"></div>
+                    <div class="color-option custom-color" title="Tùy chỉnh màu">
+                        <span>+</span>
+                        <input type="color" id="custom-color-picker" value="#7289da">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <span class="settings-title">Giao diện nền</span>
+                <div class="bg-selector">
+                    <input type="file" id="bg-upload" accept="image/*" style="display:none">
+                    <button class="bg-upload-btn">Tải lên từ máy</button>
+
+                    <span class="bg-category-title">Phong cảnh Nhật Bản</span>
+                    <div class="bg-options">
+                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/736x/a5/1d/46/a51d465948b6f5b9112b414fc93a47d6.jpg')" data-bg="japan_landscape1"></div>
+                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/736x/86/44/e4/8644e450cfc4b866d1bf68218e6bb958.jpg')" data-bg="japan_landscape2"></div>
+                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/736x/6d/40/dc/6d40dc07a417ac1d5af185eeb6254669.jpg')" data-bg="japan_landscape3"></div>
+                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/736x/11/b9/15/11b915e4d0a0808ee4aec978ae759252.jpg')" data-bg="japan_landscape3"></div>
+                    </div>
+
+                    <span class="bg-category-title">Anime</span>
+                    <div class="bg-options">
+                        <div class="bg-option" style="background-image: url('https://wallpaper.forfun.com/fetch/32/32344a97a4a120249bb0a8363879eb96.jpeg')" data-bg="anime_scenery1"></div>
+                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/736x/da/b3/59/dab359b4a8f0eab45d9cda9cdd8c70e2.jpg')" data-bg="anime_scenery2"></div>
+                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/736x/5a/90/49/5a904973a5917dea05d4d1fc3c60cace.jpg')" data-bg="anime_scenery3"></div>
+                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/736x/a4/b5/24/a4b52405c5870a9fb64ac5dbf36aa43e.jpg')" data-bg="anime_scenery4"></div>
+                    </div>
+
+                    <span class="bg-category-title">Pixel Art / Chill</span>
+                    <div class="bg-options">
+                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/736x/d4/54/8e/d4548e01fce2f0ccb100c0778e299e75.jpg')" data-bg="pixel_chill1"></div>
+                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/736x/32/b4/3d/32b43d6c5614f604aaf949d4b92bcbb6.jpg')" data-bg="pixel_chill2"></div>
+                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/736x/90/95/be/9095beaa8e13b57de773ba17d41c6bf8.jpg')" data-bg="pixel_chill3"></div>
+                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/736x/cd/57/f4/cd57f4a907cd4e2660a6b4069f5f4d74.jpg')" data-bg="pixel_chill4"></div>
+                    </div>
+
+                    <span class="bg-category-title">Gif</span>
+                    <div class="bg-options">
+                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/originals/56/dd/6a/56dd6a65e6788be82eea3e4ed77af474.gif')" data-bg="gif1"></div>
+                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/originals/50/e9/cf/50e9cfadf6d67a38c21ee84b9bb73ea6.gif')" data-bg="gif2"></div>
+                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/originals/45/0c/ac/450cac79c0828ca950c1325830515d23.gif')" data-bg="gif3"></div>
+                        <div class="bg-option" style="background-image: url('https://giffiles.alphacoders.com/130/13036.gif')" data-bg="gif4"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio element - src will be set by JavaScript -->
+    <audio id="audio" src="" preload="auto"></audio>
+
+    <!-- File JavaScript chính của bạn (cho chức năng ghi chú) -->
+    <script src="script.js"></script>
+    <!-- Script của trình phát nhạc (đã tách riêng) -->
+    <script src="music-player.js"></script>
+</body>
+</html>

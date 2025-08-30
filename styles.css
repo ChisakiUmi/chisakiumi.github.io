@@ -1,0 +1,49 @@
+body{
+    background-color: #000;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+}
+#console {
+    background-color: #000; 
+    color: #59ce41; 
+    font-family: monospace; 
+    font-size: large;
+    padding: 20px;
+    border: none;
+    overflow: auto; 
+    height: 100%; 
+    width: 100%;
+    box-sizing: border-box;
+}
+#output {
+    margin: 0; 
+    }
+#output::after {
+    content: '_'; 
+    animation: blink-caret 0.75s step-end infinite;
+}
+
+@keyframes blink-caret {
+      from, to { color: transparent }
+        50% { color: rgb(101, 197, 56); }
+    }
+#output.done::after {
+    content: '_'; 
+    animation: blink-caret 0.75s step-end infinite;
+}
+a {
+    display: none;
+}
+#output {
+    white-space: pre-line;
+    line-height: 1.2;
+    margin: 0;
+    padding: 0;
+}
+    
+#passwordDisplay {
+    display: inline;
+    margin-left: 0;
+}
