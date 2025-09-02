@@ -1,3 +1,4 @@
+const API_BASE = "https://backend-oik0.onrender.com";
 let selectedFiles = [];
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -36,7 +37,7 @@ async function saveNoteToAPI(noteText, mediaFiles, noteId, timestamp) {
             const formData = new FormData();
             formData.append('file', file);
 
-            const response = await fetch('/api/upload', {
+            const response = await fetch(`${API_BASE}/api/upload`, {
                 method: 'POST',
                 body: formData
             });
@@ -50,7 +51,7 @@ async function saveNoteToAPI(noteText, mediaFiles, noteId, timestamp) {
         }));
 
         // Sau khi upload thành công, gửi thông tin ghi chú và media
-        const response = await fetch('/api/notes', {
+        const response = await fetch(`${API_BASE}/api/notes`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -77,7 +78,7 @@ async function saveNoteToAPI(noteText, mediaFiles, noteId, timestamp) {
 
 async function loadNotes() {
     try {
-        const response = await fetch('/api/notes');  
+        const response = await fetch(`${API_BASE}/api/notes`);  
         const notes = await response.json();
         
         const currentTime = Date.now();
@@ -267,8 +268,7 @@ const emojiList = [
     '😀', '😃', '😄', '😁', '😅', '😂', '🤣', '😊',
     '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘',
     '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪',
-    '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒',
-    '❤️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', 
+    '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', 
     '😌', '😍',  '🥰', '😘', '😗', '😙', '😚', '😋',
     '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎',
     '🤩','🥳','🙂‍↕️','😏','😒','🙂‍↔️','😞','😔','😟',
@@ -278,8 +278,54 @@ const emojiList = [
     '😶‍🌫️','😐','😑','😬','🙄','😯','😦','😧','😮','😲',
     '😴','🤤','😪','😵','😵','🤐','🥴','🤢','🤮','🤧',
     '😷','🤒','🤕','🤑','🤠','😈','👿','👹','👺',
-    '🤡','💩','👻','💀','☠️','👽','👾','🤖','🎃',
-    '😺','😸','😹','😻','😼','😽','🙀','😿','😾'
+    '🤡','💩','👻','💀','☠️','👽','👾','🤖','🎃', 
+    '👋','🤚','🖐️','✋','🖖','👌','✌️','🤞','🖕',
+    '🤟','🤘','🤙','👈','👉','👆','👇','☝️','👍','👎',
+    '✊','👊','🤛','🤜','👏','🙌','👐','🤲','🤝','🙏',
+    '✍️','💪','🦵','🦶','👂','👃','👀','👁️','🧠','🦷',
+    '🦴','👅','👄',
+
+    // ❤️ Trái tim & biểu tượng
+    '💋','💌','💘','💝','💖','💗','💓','💞','💕','💟',
+    '❣️','💔','❤️','🧡','💛','💚','💙','💜','🖤',
+    '💯','💢','💥','💫','💦','💨','🕳️','🌟','✨',
+    '🔥','🌈','🎉','🎊','🎈',
+
+  
+    // 🐶 Động vật & thiên nhiên
+    '🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯',
+    '🦁','🐮','🐷','🐸','🐵','🙈','🙉','🙊','🐒','🐔',
+    '🐧','🐦','🐤','🐣','🐥','🦆','🦅','🦉','🦇','🐺',
+    '🐗','🐴','🦄','🐝','🐛','🦋','🐌','🐞','🐜',
+    '🕷️','🦂','🐢','🐍','🦎','🦖','🦕','🐙','🦑',
+    '🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈',
+    '🐊','🐅','🐆','🦓','🦍','🐘','🦛','🦏','🐪',
+    '🐫','🦒','🦘','🐂','🐃','🐄','🐎',
+
+    '⚽','🏀','🏈','⚾','🥎','🎾','🏐','🏉','🥏','🎱',
+    '🏓','🏸','🥊','🥋','🥅','⛳','⛸️','🎣','🎽',
+    '🎿','🛷','🥌','🎯','🎮','🎲','🧩','♟️',
+
+    // 🎶 Nghệ thuật / âm nhạc
+    '🎼','🎵','🎶','🎤','🎧','🎷','🎸','🎹','🎺','🎻',
+    '🥁','🎬','🎨','🖌️','🖍️',
+
+    // 🚗 Phương tiện
+    '🚗','🚕','🚌','🚎','🏎️','🚓','🚑','🚒','🚚','🚛',
+    '🚜','🚲','🛴','🛵','🏍️','✈️','🛫','🛬','🚀',
+    '🛸','🚢','⚓','⛵','🚤','🛶',
+
+    // 🌍 Thời tiết & thiên nhiên
+    '☀️','🌤️','⛅','🌥️','🌦️','🌧️','⛈️','🌩️','🌨️','❄️',
+    '☃️','⛄','🌬️','💨','🌪️','🌫️','🌈','☔','💧','🌊',
+
+    // Một số cờ
+    '🏳️','🏴','🏁','🚩',  
+    // 🏗️ Công trình & địa danh
+    '🗽','🗼','🗿','🏰','🏯','⛩️','🕌','🕍','⛪',
+    '🕋','🛤️','🌉','🌁','🗻','⛰️','🏔️','🗾','🏝️','🏜️',
+    '🌋','🏟️','🎡','🎢','🎠',
+
 ];
 
 const emojiPicker = document.getElementById('emoji-picker');
@@ -322,7 +368,7 @@ async function addReply(noteId, replyText) {
         const note = document.querySelector(`[data-note-id="${noteId}"]`);
         if (!note) return;
 
-        const response = await fetch(`/api/replies/${noteId}`, {
+        const response = await fetch(`${API_BASE}/api/replies/${noteId}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
@@ -351,7 +397,7 @@ async function addReply(noteId, replyText) {
 
 async function loadReplies(noteId) {
     try {
-        const response = await fetch(`/api/replies/${noteId}`);
+        const response = await fetch(`${API_BASE}/api/replies/${noteId}`);
         const replies = await response.json();
         const note = document.querySelector(`[data-note-id="${noteId}"]`);
         if (!note) return;
@@ -389,7 +435,7 @@ async function loadReplies(noteId) {
 
 async function loadReactions(noteId) {
     try {
-        const response = await fetch(`/api/reactions/${noteId}`);
+        const response = await fetch(`${API_BASE}/api/reactions/${noteId}`);
         if (!response.ok) throw new Error('Failed to load reactions');
         
         const reactions = await response.json();
@@ -416,7 +462,7 @@ async function loadReactions(noteId) {
 
 async function addReaction(noteId, emoji) {
     try {
-        const response = await fetch(`/api/reactions/${noteId}`, {
+        const response = await fetch(`${API_BASE}/api/reactions/${noteId}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ emoji })
