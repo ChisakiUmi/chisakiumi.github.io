@@ -25,7 +25,7 @@ function initApp() {
 
 // Tải danh sách ảnh từ server
 function loadImagesFromServer() {
-    fetch('http://localhost:3000/api/library/images')
+    fetch('https://backend-oik0.onrender.com/api/library/images')
         .then(response => response.json())
         .then(images => {
             gallery.innerHTML = '';
@@ -133,7 +133,7 @@ async function uploadImageToServer(imageData, metadata) {
     formData.append('source', metadata.source);
     formData.append('message', metadata.message);
 
-    const response = await fetch('http://localhost:3000/api/library/upload', {
+    const response = await fetch('https://backend-oik0.onrender.com/api/library/upload', {
         method: 'POST',
         body: formData
     });
@@ -143,7 +143,7 @@ async function uploadImageToServer(imageData, metadata) {
 // Xóa ảnh
 async function deleteImage(imageId) {
     try {
-        const response = await fetch(`http://localhost:3000/api/library/images/${imageId}`, {
+        const response = await fetch(`https://backend-oik0.onrender.com/api/library/images/${imageId}`, {
             method: 'DELETE'
         });
         

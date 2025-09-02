@@ -60,7 +60,7 @@ filterButtons.forEach(button => {
 });
 
 function filterNewsByCategory(category) {
-    fetch('http://localhost:3000/api/news')
+    fetch('https://backend-oik0.onrender.com/api/news')
         .then(res => res.json())
         .then(data => {
             const currentDate = new Date();
@@ -121,7 +121,7 @@ function loadNews() {
     const currentDate = new Date();
 
     // Lấy dữ liệu tin tức từ server
-    fetch('http://localhost:3000/api/news')
+    fetch('https://backend-oik0.onrender.com/api/news')
         .then(response => response.json())
         .then(data => {
             // Lọc các bài viết đã quá 3 ngày
@@ -207,7 +207,7 @@ newsForm.addEventListener('submit', function(e) {
     const category = document.getElementById('newsCategory').value;
     const author = document.getElementById('newsAuthor').value || 'Anonymous';  
 
-    if (!title || !content || !category) { // Kiểm tra các trường bắt buộc
+    if (!title || !content || !category) {
         alert('Vui lòng điền đầy đủ thông tin!');
         return;
     }
@@ -218,33 +218,34 @@ newsForm.addEventListener('submit', function(e) {
     formData.append('category', category);
     formData.append('author', author);
 
-    // Append selected files (hình ảnh) nếu có
     selectedFiles.forEach(file => formData.append('images', file));
 
-    // Gửi dữ liệu đến backend
-    fetch('http://localhost:3000/api/news', {
+    // Ẩn popup ngay lập tức
+    postNews.style.display = 'none';
+    overlay.style.display = 'none';
+
+    // Reset form và preview luôn
+    newsForm.reset();
+    mediaPreview.innerHTML = '';
+    selectedFiles = [];
+
+    // Gửi dữ liệu đến backend (chạy ngầm)
+    fetch('https://backend-oik0.onrender.com/api/news', {
         method: 'POST',
         body: formData
     })
     .then(response => response.json())
     .then(data => {
         console.log('News added:', data);
-
-        // Tạo phần tử tin tức từ response trả về
+        // Có thể thêm tin mới vào list nếu muốn
         const newsItem = createNewsElement(data);
         newsList.insertBefore(newsItem, newsList.firstChild);
-
-        // Reset form và ảnh đã chọn
-        newsForm.reset();
-        mediaPreview.innerHTML = '';
-        selectedFiles = [];
-        postNews.style.display = 'none';
-        overlay.style.display = 'none';
     })
     .catch(error => {
         console.error('Error:', error);
     });
 });
+
 
 
    // Load tin khi trang web được mở
