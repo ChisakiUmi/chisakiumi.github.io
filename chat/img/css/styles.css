@@ -202,21 +202,42 @@ h1 {
     border: 2px solid rgb(63, 214, 49);
 }
 /* Mặc định cho desktop */
+.modal {
+    display: flex;
+    align-items: center;   
+    justify-content: center; 
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+}
+
 .modal-content {
     display: flex;
-    align-items: flex-start;
+    flex-direction: row; 
     gap: 20px;
+    max-width: 90vw;   
+    max-height: 90vh;  
+    background: #000;  
+    padding: 20px;
+    border-radius: 10px;
+    overflow: auto;
 }
 
 .modal-content img {
-    max-width: 70%;
+    max-width: 60%;   
+    max-height: 80vh; 
     border-radius: 10px;
+    object-fit: contain;
 }
 
 .modal-info {
     flex: 1;
-    padding: 10px;
+    color: #00ff00; 
+    font-size: 1rem;
+    overflow-y: auto;
 }
+
 
 /* Mobile: info nằm dưới ảnh */
 @media (max-width: 768px) {
