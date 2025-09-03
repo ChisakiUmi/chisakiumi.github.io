@@ -226,8 +226,8 @@ h1 {
 
 
 .modal-content img {
-    flex: 2;
-    height: 100%;
+    max-width: 65%;   
+    max-height: 90vh;
     width: auto;
     object-fit: contain;
     border-radius: 10px;
