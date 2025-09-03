@@ -204,65 +204,70 @@ h1 {
 /* Mặc định cho desktop */
 .modal {
     display: flex;
-    align-items: center;   
-    justify-content: center;
+    align-items: center;
+    justify-content: space-between;  
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.95);
+    background: rgba(0, 0, 0, 0.9);  
     z-index: 1000;
+    padding: 40px;  
 }
 
 .modal-content {
     display: flex;
     flex-direction: row;
-    width: 95vw;    
-    height: 90vh;   
-    gap: 20px;
-    background: #000;
-    border-radius: 10px;
-    overflow: hidden;   
-    padding: 20px;
-}
-
-.modal-content img {
-    flex: 2;                
+    justify-content: space-between;
+    align-items: center;
     width: 100%;
     height: 100%;
-    object-fit: contain;    
+    gap: 40px; 
+    background: none; 
+}
+
+
+.modal-content img {
+    flex: 2;
+    height: 100%;
+    width: auto;
+    object-fit: contain;
     border-radius: 10px;
 }
 
 .modal-info {
-    flex: 1;                
+    flex: 1;
     color: #00ff00;
-    font-size: 1.1rem;
-    overflow-y: auto;       
+    font-size: 1.2rem;
+    overflow-y: auto;
+    height: 100%;
     padding-left: 20px;
     border-left: 2px solid #00ff00;
     display: flex;
     flex-direction: column;
-    justify-content: center; 
+    justify-content: flex-start; 
 }
-
 
 /* Mobile: info nằm dưới ảnh */
 @media (max-width: 768px) {
     .modal-content {
-        display: block;
+        flex-direction: column;
+        gap: 20px;
+        align-items: flex-start;   /* không căn giữa nữa */
+        justify-content: flex-start; /* bắt đầu từ trên xuống */
     }
 
     .modal-content img {
-        max-width: 100%;
-        margin-bottom: 15px;
+        width: 100%;
+        height: auto;
+        max-height: 60vh;
     }
 
     .modal-info {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-    }
-    .modal-info div {
-        text-align: center;
-        font-size: 0.9rem;
+        border-left: none;
+        border-top: 2px solid #00ff00;
+        padding-left: 0;
+        padding-top: 10px;
+        height: auto;
+        width: 100%; /* chiếm đủ ngang màn hình */
     }
 }
+
