@@ -478,6 +478,49 @@ async function addReaction(noteId, emoji) {
     }
 }
 
+let clickTimer = null;
+
+async function handleReactionClick(noteId, emoji) {
+    if (clickTimer) {
+        // Double click
+        clearTimeout(clickTimer);
+        clickTimer = null;
+
+        try {
+            const response = await fetch(`${API_BASE}/api/reactions/${noteId}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ emoji })
+            });
+
+            if (!response.ok) throw new Error('Failed to remove reaction');
+            await loadReactions(noteId);
+
+        } catch (error) {
+            console.error('Error removing reaction:', error);
+        }
+
+    } else {
+        // Single click (chờ xem có double không)
+        clickTimer = setTimeout(async () => {
+            try {
+                const response = await fetch(`${API_BASE}/api/reactions/${noteId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ emoji })
+                });
+
+                if (!response.ok) throw new Error('Failed to add reaction');
+                await loadReactions(noteId);
+
+            } catch (error) {
+                console.error('Error adding reaction:', error);
+            }
+            clickTimer = null;
+        }, 250); // 250ms threshold cho double click
+    }
+}
+
 
 
 document.addEventListener('click', (e) => {
