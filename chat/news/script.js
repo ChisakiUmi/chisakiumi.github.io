@@ -220,17 +220,8 @@ newsForm.addEventListener('submit', function(e) {
 
     selectedFiles.forEach(file => formData.append('images', file));
 
-    // Ẩn popup ngay lập tức
-    postNews.style.display = 'none';
-    overlay.style.display = 'none';
-
-    // Reset form và preview luôn
-    newsForm.reset();
-    mediaPreview.innerHTML = '';
-    selectedFiles = [];
-
-    // Gửi dữ liệu đến backend (chạy ngầm)
-    fetch('https://backend-oik0.onrender.com/api/news', {
+    // Gửi dữ liệu đến backend
+    fetch('http://localhost:3000/api/news', {
         method: 'POST',
         body: formData
     })
