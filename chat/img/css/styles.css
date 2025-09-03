@@ -204,8 +204,8 @@ h1 {
 /* Mặc định cho desktop */
 .modal-content {
     display: flex;
-    gap: 20px;
     align-items: flex-start;
+    gap: 20px;
 }
 
 .modal-content img {
@@ -215,20 +215,10 @@ h1 {
 
 .modal-info {
     flex: 1;
-    display: block;
     padding: 10px;
 }
 
-.modal-info div {
-    background: rgba(0,0,0,0.6);
-    color: #2ecc71;
-    padding: 8px;
-    border-radius: 6px;
-    margin-bottom: 8px;
-    font-size: 1rem;
-}
-
-/* Responsive cho mobile */
+/* Mobile: info nằm dưới ảnh */
 @media (max-width: 768px) {
     .modal-content {
         display: block;
@@ -241,14 +231,11 @@ h1 {
 
     .modal-info {
         display: grid;
-        grid-template-columns: repeat(2, 1fr); /* hoặc 4 cột tuỳ bạn */
+        grid-template-columns: repeat(2, 1fr);
         gap: 10px;
     }
-
     .modal-info div {
         text-align: center;
         font-size: 0.9rem;
     }
 }
-
-
