@@ -221,7 +221,7 @@ newsForm.addEventListener('submit', function(e) {
     selectedFiles.forEach(file => formData.append('images', file));
 
     // Gửi dữ liệu đến backend
-    fetch('http://localhost:3000/api/news', {
+    fetch('https://backend-oik0.onrender.com/api/news', {
         method: 'POST',
         body: formData
     })
