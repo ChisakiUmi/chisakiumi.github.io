@@ -65,7 +65,7 @@ function filterNewsByCategory(category) {
         .then(data => {
             const currentDate = new Date();
             let filtered = data.filter(news => {
-                const newsDate = new Date(news.date);
+                const newsDate = new Date(news.timestamp);
                 const diffDays = Math.ceil(Math.abs(currentDate - newsDate) / (1000 * 60 * 60 * 24));
                 return diffDays <= 3;
             });
@@ -126,7 +126,7 @@ function loadNews() {
         .then(data => {
             // Lọc các bài viết đã quá 3 ngày
             const filteredNews = data.filter(news => {
-                const newsDate = new Date(news.date);
+                const newsDate = new Date(news.timestamp);
                 const diffTime = Math.abs(currentDate - newsDate);
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                 return diffDays <= 3;  // Chỉ lấy các bài viết trong vòng 3 ngày
@@ -156,7 +156,7 @@ function createNewsElement(news) {
     newsItem.innerHTML = `
         <div class="news-header">
             <h3 class="news-title">${news.title}</h3>
-            <span class="news-date">${new Date(news.date).toLocaleDateString('vi-VN')}</span>
+            <span class="news-date">${new Date(news.timestamp).toLocaleDateString('vi-VN')}</span>
         </div>
         ${imagesHTML}
         <div class="news-content">${news.content}</div>
