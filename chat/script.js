@@ -1,6 +1,12 @@
 const API_BASE = "https://backend-oik0.onrender.com";
 let selectedFiles = [];
 
+if (!localStorage.getItem('user_id')) {
+  const randomId = 'u-' + Date.now() + '-' + Math.floor(Math.random() * 100000);
+  localStorage.setItem('user_id', randomId);
+}
+const user_id = localStorage.getItem('user_id');
+
 document.addEventListener('DOMContentLoaded', () => {
     loadNotes();
     setInterval(loadNotes, 60000);
@@ -507,14 +513,6 @@ async function handleReactionClick(noteId, emoji, user_id) {
         }, 250); 
     }
 }
-
-if (!localStorage.getItem('user_id')) {
-  const randomId = 'u-' + Date.now() + '-' + Math.floor(Math.random() * 100000);
-  localStorage.setItem('user_id', randomId);
-}
-const user_id = localStorage.getItem('user_id');
-
-
 
 document.addEventListener('click', (e) => {
     const reactionPickers = document.querySelectorAll('.reaction-picker');
