@@ -1,11 +1,11 @@
 const API_BASE = "https://backend-oik0.onrender.com";
 let selectedFiles = [];
 
-if (!localStorage.getItem('user_id')) {
-  const randomId = 'u-' + Date.now() + '-' + Math.floor(Math.random() * 100000);
-  localStorage.setItem('user_id', randomId);
+let user_id = localStorage.getItem("user_id");
+if (!user_id) {
+  user_id = "u-" + Date.now() + "-" + Math.floor(Math.random() * 100000);
+  localStorage.setItem("user_id", user_id);
 }
-const user_id = localStorage.getItem('user_id');
 
 document.addEventListener('DOMContentLoaded', () => {
     loadNotes();
