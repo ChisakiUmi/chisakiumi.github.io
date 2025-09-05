@@ -32,7 +32,6 @@ document.getElementById('submit-note').addEventListener('click', async function(
 
 async function saveNoteToAPI(noteText, mediaFiles, noteId, timestamp) {
     try {
-        // Upload media files trước
         const mediaURLs = await Promise.all(selectedFiles.map(async file => {
             const formData = new FormData();
             formData.append('file', file);
@@ -50,7 +49,6 @@ async function saveNoteToAPI(noteText, mediaFiles, noteId, timestamp) {
             return { url: data.url, type: file.type };
         }));
 
-        // Sau khi upload thành công, gửi thông tin ghi chú và media
         const response = await fetch(`${API_BASE}/api/notes`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -161,7 +159,7 @@ function initializeNoteFeatures(noteDisplay, noteId) {
         const button = document.createElement('button');
         button.className = 'emoji-btn';
         button.textContent = emoji;
-        button.onclick = () => addReaction(noteId, emoji);
+        button.onclick = () => handleReactionClick(noteId, emoji, user_id);
         reactionPicker.appendChild(button);
     });
 
@@ -285,14 +283,11 @@ const emojiList = [
     '✍️','💪','🦵','🦶','👂','👃','👀','👁️','🧠','🦷',
     '🦴','👅','👄',
 
-    // ❤️ Trái tim & biểu tượng
     '💋','💌','💘','💝','💖','💗','💓','💞','💕','💟',
     '❣️','💔','❤️','🧡','💛','💚','💙','💜','🖤',
     '💯','💢','💥','💫','💦','💨','🕳️','🌟','✨',
     '🔥','🌈','🎉','🎊','🎈',
 
-  
-    // 🐶 Động vật & thiên nhiên
     '🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯',
     '🦁','🐮','🐷','🐸','🐵','🙈','🙉','🙊','🐒','🐔',
     '🐧','🐦','🐤','🐣','🐥','🦆','🦅','🦉','🦇','🐺',
@@ -306,22 +301,18 @@ const emojiList = [
     '🏓','🏸','🥊','🥋','🥅','⛳','⛸️','🎣','🎽',
     '🎿','🛷','🥌','🎯','🎮','🎲','🧩','♟️',
 
-    // 🎶 Nghệ thuật / âm nhạc
     '🎼','🎵','🎶','🎤','🎧','🎷','🎸','🎹','🎺','🎻',
     '🥁','🎬','🎨','🖌️','🖍️',
 
-    // 🚗 Phương tiện
     '🚗','🚕','🚌','🚎','🏎️','🚓','🚑','🚒','🚚','🚛',
     '🚜','🚲','🛴','🛵','🏍️','✈️','🛫','🛬','🚀',
     '🛸','🚢','⚓','⛵','🚤','🛶',
 
-    // 🌍 Thời tiết & thiên nhiên
     '☀️','🌤️','⛅','🌥️','🌦️','🌧️','⛈️','🌩️','🌨️','❄️',
     '☃️','⛄','🌬️','💨','🌪️','🌫️','🌈','☔','💧','🌊',
 
-    // Một số cờ
     '🏳️','🏴','🏁','🚩',  
-    // 🏗️ Công trình & địa danh
+
     '🗽','🗼','🗿','🏰','🏯','⛩️','🕌','🕍','⛪',
     '🕋','🛤️','🌉','🌁','🗻','⛰️','🏔️','🗾','🏝️','🏜️',
     '🌋','🏟️','🎡','🎢','🎠',
@@ -379,7 +370,6 @@ async function addReply(noteId, replyText) {
 
         const data = await response.json();
         
-        // Cập nhật ngay lập tức số lượng reply
         const replyButton = note.querySelector('.reply-button');
         if (replyButton) {
             const currentText = replyButton.textContent.trim();
@@ -387,7 +377,7 @@ async function addReply(noteId, replyText) {
             replyButton.innerHTML = `<i class="fas fa-reply"></i> ${currentCount + 1}`;
         }
 
-        loadReplies(noteId); // Tải lại toàn bộ replies
+        loadReplies(noteId); 
         
     } catch (error) {
         console.error('Error adding reply:', error);
@@ -405,7 +395,6 @@ async function loadReplies(noteId) {
         const repliesContainer = note.querySelector('.replies');
         repliesContainer.innerHTML = '';
 
-        // Update reply count in note footer
         const replyCount = replies.length;
         const replyButton = note.querySelector('.reply-button');
         if (replyButton) {
@@ -450,7 +439,7 @@ async function loadReactions(noteId) {
             const reactionElement = document.createElement('span');
             reactionElement.className = 'reaction';
             reactionElement.innerHTML = `${reaction.emoji} <span class="reaction-count">${count}</span>`;
-            reactionElement.onclick = () => addReaction(noteId, reaction.emoji);
+            reactionElement.onclick = () => handleReactionClick(noteId, reaction.emoji, user_id);
             reactionsContainer.appendChild(reactionElement);
         });
 
@@ -465,12 +454,11 @@ async function addReaction(noteId, emoji) {
         const response = await fetch(`${API_BASE}/api/reactions/${noteId}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ emoji })
+            body: JSON.stringify({ emoji, user_id })
         });
 
         if (!response.ok) throw new Error('Failed to add reaction');
 
-        // Sau khi thêm reaction, load lại toàn bộ reactions từ backend
         await loadReactions(noteId);
 
     } catch (error) {
@@ -480,9 +468,8 @@ async function addReaction(noteId, emoji) {
 
 let clickTimer = null;
 
-async function handleReactionClick(noteId, emoji) {
+async function handleReactionClick(noteId, emoji, user_id) {
     if (clickTimer) {
-        // Double click
         clearTimeout(clickTimer);
         clickTimer = null;
 
@@ -490,7 +477,7 @@ async function handleReactionClick(noteId, emoji) {
             const response = await fetch(`${API_BASE}/api/reactions/${noteId}`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ emoji })
+                body: JSON.stringify({ emoji, user_id })
             });
 
             if (!response.ok) throw new Error('Failed to remove reaction');
@@ -501,13 +488,13 @@ async function handleReactionClick(noteId, emoji) {
         }
 
     } else {
-        // Single click (chờ xem có double không)
+        
         clickTimer = setTimeout(async () => {
             try {
                 const response = await fetch(`${API_BASE}/api/reactions/${noteId}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ emoji })
+                    body: JSON.stringify({ emoji, user_id })
                 });
 
                 if (!response.ok) throw new Error('Failed to add reaction');
@@ -517,9 +504,15 @@ async function handleReactionClick(noteId, emoji) {
                 console.error('Error adding reaction:', error);
             }
             clickTimer = null;
-        }, 250); // 250ms threshold cho double click
+        }, 250); 
     }
 }
+
+if (!localStorage.getItem('user_id')) {
+  const randomId = 'u-' + Date.now() + '-' + Math.floor(Math.random() * 100000);
+  localStorage.setItem('user_id', randomId);
+}
+const user_id = localStorage.getItem('user_id');
 
 
 
