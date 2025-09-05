@@ -5,8 +5,6 @@ filterToggle.addEventListener('click', () => {
     filterSection.style.display = filterSection.style.display === 'none' ? 'flex' : 'none';
 });
 
-
-// Xử lý preview ảnh
 const newsImage = document.getElementById('newsImage');
 const mediaPreview = document.getElementById('mediaPreview');
 let selectedFiles = [];
@@ -44,11 +42,9 @@ function displayPreview(file) {
     reader.readAsDataURL(file);
 }
 
-// Xử lý đăng tin
 const newsForm = document.getElementById('newsForm');
 const newsList = document.getElementById('newsList');
 
-// Xử lý filter buttons
 const filterButtons = document.querySelectorAll('.filter-button');
 filterButtons.forEach(button => {
     button.addEventListener('click', function() {
@@ -82,7 +78,6 @@ function filterNewsByCategory(category) {
         });
 }
 
-// Xử lý search
 const searchBar = document.querySelector('.search-bar');
 searchBar.addEventListener('input', function(e) {
     const searchTerm = e.target.value.toLowerCase();
@@ -121,19 +116,18 @@ function saveNews(newsItem) {
 function loadNews() {
     const currentDate = new Date();
 
-    // Lấy dữ liệu tin tức từ server
     fetch('https://backend-oik0.onrender.com/api/news')
         .then(response => response.json())
         .then(data => {
-            // Lọc các bài viết đã quá 3 ngày
+
             const filteredNews = data.filter(news => {
                 const newsDate = new Date(news.timestamp);
                 const diffTime = Math.abs(currentDate - newsDate);
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                return diffDays <= 3;  // Chỉ lấy các bài viết trong vòng 3 ngày
+                return diffDays <= 3;  
             });
 
-            // Hiển thị tin đã lọc
+            
             newsList.innerHTML = '';
             filteredNews.forEach(news => {
                 const newsItem = createNewsElement(news);
@@ -146,7 +140,7 @@ function loadNews() {
 }
 
 
-    // Function tạo element tin tức
+    
 function createNewsElement(news) {
     const newsItem = document.createElement('div');
     newsItem.className = 'news-item';   
@@ -172,11 +166,9 @@ function createNewsElement(news) {
     setTimeout(() => {
         const content = newsItem.querySelector('.news-content');
         const readMore = newsItem.querySelector('.read-more');
-        // Kiểm tra nếu nội dung vượt quá chiều cao cho phép
         if (content.scrollHeight > 100) {
             readMore.style.display = 'inline-block';
             
-            // Thêm gradient mờ ở cuối nội dung
             content.style.position = 'relative';
             content.style.maskImage = 'linear-gradient(to bottom, black 50%, transparent 100%)';
             content.style.webkitMaskImage = 'linear-gradient(to bottom, black 50%, transparent 100%)';
@@ -200,7 +192,6 @@ function createNewsElement(news) {
     return newsItem;
 }
 
-// Cập nhật xử lý form submit
 newsForm.addEventListener('submit', function(e) {
     e.preventDefault();
 
@@ -222,7 +213,6 @@ newsForm.addEventListener('submit', function(e) {
 
     selectedFiles.forEach(file => formData.append('images', file));
 
-    // Gửi dữ liệu đến backend
     fetch('https://backend-oik0.onrender.com/api/news', {
         method: 'POST',
         body: formData
@@ -230,7 +220,6 @@ newsForm.addEventListener('submit', function(e) {
     .then(response => response.json())
     .then(data => {
         console.log('News added:', data);
-        // Có thể thêm tin mới vào list nếu muốn
         const newsItem = createNewsElement(data);
         newsList.insertBefore(newsItem, newsList.firstChild);
     })
@@ -240,11 +229,8 @@ newsForm.addEventListener('submit', function(e) {
 });
 
 
-
-   // Load tin khi trang web được mở
 window.addEventListener('load', loadNews);
         
-    // Kiểm tra và xóa tin cũ mỗi giờ
 setInterval(loadNews, 1000 * 60 * 60);
 
 const addButton = document.querySelector('.add-button');
@@ -265,7 +251,7 @@ overlay.addEventListener('click', () => {
 const imageModal = document.createElement('div');
 imageModal.className = 'image-modal';
 document.body.appendChild(imageModal);
-    // Xử lý click ảnh
+
 document.addEventListener('click', function(e) {
 if (e.target.classList.contains('news-image')) {
     const modalImg = document.createElement('img');
@@ -277,7 +263,7 @@ if (e.target.classList.contains('news-image')) {
     }
 });
 
-// Đóng modal khi click
+
 imageModal.addEventListener('click', function() {
     this.style.display = 'none';
 });
