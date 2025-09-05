@@ -106,10 +106,11 @@ function saveNews(newsItem) {
         title: newsItem.querySelector('.news-title').textContent,
         content: newsItem.querySelector('.news-content').textContent,
         category: document.getElementById('newsCategory').value,
-        date: new Date().toISOString(),
+        timestamp: Date.now(),
         images: Array.from(newsItem.querySelectorAll('.news-image')).map(img => img.src),
         comments: [],
-        likes: 0
+        likes: 0,
+        author: document.getElementById('newsAuthor').value || 'Ẩn danh'
     };
 
     let savedNews = JSON.parse(localStorage.getItem('news') || '[]');
@@ -151,6 +152,7 @@ function createNewsElement(news) {
     newsItem.className = 'news-item';   
     newsItem.dataset.newsId = news.id;
 
+    const imagesArray = Array.isArray(news.images) ? news.images : [];
     let imagesHTML = news.images.map(img => `<img src="${img}" class="news-image">`).join('');
     
     newsItem.innerHTML = `
