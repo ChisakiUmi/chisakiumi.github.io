@@ -10,6 +10,19 @@ const submitInfoBtn = document.getElementById('submitInfoBtn');
 const closeInfoModal = document.getElementById('closeInfoModal');
 let currentImageData;
 
+function dataURLtoBlob(dataurl) {
+    const arr = dataurl.split(',');
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], { type: mime });
+}
+
+
 // Event Listeners
 document.addEventListener('DOMContentLoaded', initApp);
 fileInput.addEventListener('change', handleFileSelect);
@@ -113,11 +126,26 @@ function submitImageInfo() {
         message: document.getElementById('messageInput').value || '',
     };
 
-    const blob = dataURLtoBlob(currentImageData); 
+    // Nếu chưa có ảnh thì báo lỗi
+    if (!currentImageData) {
+        alert("Chưa chọn ảnh!");
+        return;
+    }
+
+    const blob = dataURLtoBlob(currentImageData);
+
     uploadImageToServer(blob, metadata)
         .then(data => {
             createImageCard(data.url, data.id, data);
-            closeInfoModalHandler(); 
+
+            // Reset form + input file sau khi đăng
+            document.getElementById('authorInput').value = '';
+            document.getElementById('sourceInput').value = '';
+            document.getElementById('messageInput').value = '';
+            document.getElementById('fileInput').value = '';
+            currentImageData = null;
+
+            closeInfoModalHandler(); // tắt form nhập ngay
         })
         .catch(error => {
             console.error('Lỗi tải lên ảnh:', error);
@@ -125,9 +153,10 @@ function submitImageInfo() {
         });
 }
 
+
 async function uploadImageToServer(imageBlob, metadata) {
     const formData = new FormData();
-    formData.append('image', imageBlob); 
+    formData.append('image', imageBlob, `upload-${Date.now()}.png`); 
     formData.append('author', metadata.author);
     formData.append('source', metadata.source);
     formData.append('message', metadata.message);
