@@ -113,11 +113,11 @@ function submitImageInfo() {
         message: document.getElementById('messageInput').value || '',
     };
 
-    const blob = dataURLtoBlob(currentImageData); // ✅ chuyển base64 thành Blob
+    const blob = dataURLtoBlob(currentImageData); 
     uploadImageToServer(blob, metadata)
         .then(data => {
             createImageCard(data.url, data.id, data);
-            closeInfoModalHandler(); // ✅ đóng form ngay sau khi bấm đăng
+            closeInfoModalHandler(); 
         })
         .catch(error => {
             console.error('Lỗi tải lên ảnh:', error);
@@ -125,10 +125,9 @@ function submitImageInfo() {
         });
 }
 
-// Giao tiếp với server để tải ảnh lên
 async function uploadImageToServer(imageBlob, metadata) {
     const formData = new FormData();
-    formData.append('image', imageBlob, `upload-${Date.now()}.png`); // ✅ dùng Blob
+    formData.append('image', file); 
     formData.append('author', metadata.author);
     formData.append('source', metadata.source);
     formData.append('message', metadata.message);
