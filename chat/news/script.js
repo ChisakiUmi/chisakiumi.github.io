@@ -224,16 +224,23 @@ newsForm.addEventListener('submit', function(e) {
         if (data && !data.error) {
             const newsItem = createNewsElement(data);
             newsList.insertBefore(newsItem, newsList.firstChild);
+
+            newsForm.reset();
+            selectedFiles = [];
+            mediaPreview.innerHTML = "";
+
+            postNews.style.display = 'none';
+            overlay.style.display = 'none';
         } else {
             console.error('Lỗi từ backend khi thêm news:', data.error || data);
             alert('Không thể đăng tin, vui lòng thử lại!');
         }
     })
-
     .catch(error => {
         console.error('Error:', error);
     });
 });
+
 
 
 window.addEventListener('load', loadNews);
