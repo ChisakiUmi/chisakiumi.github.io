@@ -147,7 +147,8 @@ function createNewsElement(news) {
     newsItem.dataset.newsId = news.id;
 
     const imagesArray = Array.isArray(news.images) ? news.images : [];
-    let imagesHTML = news.images.map(img => `<img src="${img}" class="news-image">`).join('');
+    let imagesHTML = imagesArray.map(img => `<img src="${img}" class="news-image">`).join('');
+
     
     newsItem.innerHTML = `
         <div class="news-header">
@@ -220,9 +221,15 @@ newsForm.addEventListener('submit', function(e) {
     .then(response => response.json())
     .then(data => {
         console.log('News added:', data);
-        const newsItem = createNewsElement(data);
-        newsList.insertBefore(newsItem, newsList.firstChild);
+        if (data && !data.error) {
+            const newsItem = createNewsElement(data);
+            newsList.insertBefore(newsItem, newsList.firstChild);
+        } else {
+            console.error('Lỗi từ backend khi thêm news:', data.error || data);
+            alert('Không thể đăng tin, vui lòng thử lại!');
+        }
     })
+
     .catch(error => {
         console.error('Error:', error);
     });
