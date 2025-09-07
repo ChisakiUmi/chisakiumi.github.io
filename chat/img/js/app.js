@@ -128,7 +128,7 @@ function submitImageInfo() {
 // Giao tiếp với server để tải ảnh lên
 async function uploadImageToServer(imageData, metadata) {
     const formData = new FormData();
-    formData.append('image', dataURLtoBlob(imageData));
+    formData.append('image', file);
     formData.append('author', metadata.author);
     formData.append('source', metadata.source);
     formData.append('message', metadata.message);
