@@ -127,7 +127,7 @@ function submitImageInfo() {
 
 async function uploadImageToServer(imageBlob, metadata) {
     const formData = new FormData();
-    formData.append('image', file); 
+    formData.append('image', imageBlob); 
     formData.append('author', metadata.author);
     formData.append('source', metadata.source);
     formData.append('message', metadata.message);
