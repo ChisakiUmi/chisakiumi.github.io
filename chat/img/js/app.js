@@ -1,4 +1,6 @@
 // DOM Elements
+let selectedFile = null;
+
 const fileInput = document.getElementById('file-input');
 const gallery = document.getElementById('gallery');
 const infoModal = document.getElementById('infoModal');
@@ -55,6 +57,7 @@ function handleFileSelect(event) {
     
     for (let file of files) {
         if (file.type.startsWith('image/')) {
+            selectedFile = file;
             const reader = new FileReader();
             
             reader.onload = function(e) {
@@ -140,7 +143,7 @@ function submitImageInfo() {
             document.getElementById('authorInput').value = '';
             document.getElementById('sourceInput').value = '';
             document.getElementById('messageInput').value = '';
-            document.getElementById('fileInput').value = '';
+            document.getElementById('file-input').value = '';
             selectedFile = null;
         })
         .catch(error => {
