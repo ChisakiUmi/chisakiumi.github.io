@@ -126,26 +126,22 @@ function submitImageInfo() {
         message: document.getElementById('messageInput').value || '',
     };
 
-    // Nếu chưa có ảnh thì báo lỗi
-    if (!currentImageData) {
+    if (!selectedFile) {
         alert("Chưa chọn ảnh!");
         return;
     }
 
-    const blob = dataURLtoBlob(currentImageData);
+    closeInfoModalHandler();
 
-    uploadImageToServer(blob, metadata)
+    uploadImageToServer(selectedFile, metadata)
         .then(data => {
             createImageCard(data.url, data.id, data);
 
-            // Reset form + input file sau khi đăng
             document.getElementById('authorInput').value = '';
             document.getElementById('sourceInput').value = '';
             document.getElementById('messageInput').value = '';
             document.getElementById('fileInput').value = '';
-            currentImageData = null;
-
-            closeInfoModalHandler(); // tắt form nhập ngay
+            selectedFile = null;
         })
         .catch(error => {
             console.error('Lỗi tải lên ảnh:', error);
@@ -154,22 +150,23 @@ function submitImageInfo() {
 }
 
 
-async function uploadImageToServer(imageBlob, metadata) {
-    const formData = new FormData();
-    formData.append('image', imageBlob, `upload-${Date.now()}.png`); 
-    formData.append('author', metadata.author);
-    formData.append('source', metadata.source);
-    formData.append('message', metadata.message);
 
-    const response = await fetch('https://backend-oik0.onrender.com/api/library/upload', {
-        method: 'POST',
-        body: formData
+async function uploadImageToServer(file, metadata) {
+    const formData = new FormData();
+    formData.append("image", file); 
+    formData.append("author", metadata.author);
+    formData.append("source", metadata.source);
+    formData.append("message", metadata.message);
+
+    const res = await fetch("https://backend-oik0.onrender.com/api/library/upload", {
+        method: "POST",
+        body: formData,
     });
 
-    if (!response.ok) throw new Error("Upload thất bại");
-    return await response.json();
-}
+    if (!res.ok) throw new Error("Upload failed");
 
+    return res.json();
+}
 
 // Xóa ảnh
 async function deleteImage(imageId) {
