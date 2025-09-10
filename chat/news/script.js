@@ -73,7 +73,7 @@ function filterNewsByCategory(category) {
             newsList.innerHTML = '';
             filtered.forEach(news => {
                 const item = createNewsElement(news);
-                newsList.appendChild(item, newsList.firstChild);
+                newsList.insertBefore(item, newsList.firstChild);
             });
         });
 }
@@ -132,7 +132,7 @@ function loadNews() {
             newsList.innerHTML = '';
             filteredNews.forEach(news => {
                 const newsItem = createNewsElement(news);
-                newsList.appendChild(newsItem, newsList.firstChild);
+                newsList.prepend(newsItem, newsList.firstChild);
             });
         })
         .catch(error => {
@@ -224,7 +224,7 @@ newsForm.addEventListener('submit', function(e) {
         console.log('News added:', data);
         if (data && !data.error) {
             const newsItem = createNewsElement(data);
-            newsList.appendChild(newsItem, newsList.firstChild);
+            newsList.prepend(newsItem, newsList.firstChild);
 
             newsForm.reset();
             selectedFiles = [];
