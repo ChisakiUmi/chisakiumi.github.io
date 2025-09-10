@@ -132,7 +132,7 @@ function loadNews() {
             newsList.innerHTML = '';
             filteredNews.forEach(news => {
                 const newsItem = createNewsElement(news);
-                newsList.insertBefore(newsItem, newsList.firstChild);
+                newsList.appendChild(newsItem, newsList.firstChild);
             });
         })
         .catch(error => {
