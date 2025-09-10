@@ -73,7 +73,7 @@ function filterNewsByCategory(category) {
             newsList.innerHTML = '';
             filtered.forEach(news => {
                 const item = createNewsElement(news);
-                newsList.insertBefore(item, newsList.firstChild);
+                newsList.appendChild(item, newsList.firstChild);
             });
         });
 }
@@ -224,7 +224,7 @@ newsForm.addEventListener('submit', function(e) {
         console.log('News added:', data);
         if (data && !data.error) {
             const newsItem = createNewsElement(data);
-            newsList.insertBefore(newsItem, newsList.firstChild);
+            newsList.appendChild(newsItem, newsList.firstChild);
 
             newsForm.reset();
             selectedFiles = [];
