@@ -126,8 +126,9 @@ function loadNews() {
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                 return diffDays <= 3;  
             });
-
             
+            filteredNews.sort((a, b) => b.timestamp - a.timestamp);
+
             newsList.innerHTML = '';
             filteredNews.forEach(news => {
                 const newsItem = createNewsElement(news);
