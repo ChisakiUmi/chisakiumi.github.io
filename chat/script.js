@@ -428,11 +428,14 @@ async function loadReplies(noteId) {
     }
 }
 
+// ---------- Reactions: improved, per-emoji handling ----------
+
+// Tải reactions (gửi user_id để backend trả về flag 'me')
 async function loadReactions(noteId) {
     try {
-        const response = await fetch(`${API_BASE}/api/reactions/${noteId}`);
+        const response = await fetch(`${API_BASE}/api/reactions/${noteId}?user_id=${encodeURIComponent(user_id)}`);
         if (!response.ok) throw new Error('Failed to load reactions');
-        
+
         const reactions = await response.json();
         const note = document.querySelector(`[data-note-id="${noteId}"]`);
         if (!note) return;
@@ -440,79 +443,147 @@ async function loadReactions(noteId) {
         const reactionsContainer = note.querySelector('.reactions');
         reactionsContainer.innerHTML = '';
 
+        // reactions expected: [{ emoji, count, me }]
         reactions.forEach(reaction => {
-            const count = reaction.count || 1;
-            const reactionElement = document.createElement('span');
-            reactionElement.className = 'reaction';
-            reactionElement.innerHTML = `${reaction.emoji} <span class="reaction-count">${count}</span>`;
-            reactionElement.onclick = () => handleReactionClick(noteId, reaction.emoji, user_id);
-            reactionsContainer.appendChild(reactionElement);
-        });
+            const count = reaction.count || 0;
+            const reactionBtn = document.createElement('button'); // button for accessibility
+            reactionBtn.type = 'button';
+            reactionBtn.className = 'reaction';
+            if (reaction.me) reactionBtn.classList.add('my-reaction');
 
+            reactionBtn.innerHTML = `${reaction.emoji} <span class="reaction-count">${count}</span>`;
+            // click toggles (POST toggles server-side)
+            reactionBtn.addEventListener('click', () => toggleReaction(noteId, reaction.emoji, reactionBtn));
+            reactionsContainer.appendChild(reactionBtn);
+        });
     } catch (error) {
         console.error('Error loading reactions:', error);
     }
 }
 
+// Toggle reaction with optimistic UI
+async function toggleReaction(noteId, emoji, element) {
+    // find count span
+    const countSpan = element.querySelector('.reaction-count');
+    let count = parseInt(countSpan ? countSpan.textContent : '0') || 0;
+    const wasMine = element.classList.contains('my-reaction');
 
-async function addReaction(noteId, emoji) {
+    // optimistic update
+    if (wasMine) {
+        element.classList.remove('my-reaction');
+        count = Math.max(0, count - 1);
+    } else {
+        element.classList.add('my-reaction');
+        count = count + 1;
+    }
+    if (countSpan) countSpan.textContent = count;
+
+    // send toggle request (backend should toggle based on existing user reaction)
     try {
-        const response = await fetch(`${API_BASE}/api/reactions/${noteId}`, {
+        const res = await fetch(`${API_BASE}/api/reactions/${noteId}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ emoji, user_id })
         });
 
-        if (!response.ok) throw new Error('Failed to add reaction');
-
-        await loadReactions(noteId);
-
-    } catch (error) {
-        console.error('Error adding reaction:', error);
-    }
-}
-
-let clickTimer = null;
-
-async function handleReactionClick(noteId, emoji, user_id) {
-    if (clickTimer) {
-        clearTimeout(clickTimer);
-        clickTimer = null;
-
-        try {
-            const response = await fetch(`${API_BASE}/api/reactions/${noteId}`, {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ emoji, user_id })
-            });
-
-            if (!response.ok) throw new Error('Failed to remove reaction');
-            await loadReactions(noteId);
-
-        } catch (error) {
-            console.error('Error removing reaction:', error);
+        if (!res.ok) {
+            // Revert optimistic if server fails
+            console.error('Failed to toggle reaction:', await res.text());
+            if (wasMine) {
+                element.classList.add('my-reaction');
+                count = count + 1;
+            } else {
+                element.classList.remove('my-reaction');
+                count = Math.max(0, count - 1);
+            }
+            if (countSpan) countSpan.textContent = count;
+            return;
         }
 
-    } else {
-        
-        clickTimer = setTimeout(async () => {
-            try {
-                const response = await fetch(`${API_BASE}/api/reactions/${noteId}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ emoji, user_id })
-                });
+        // sync with server to get canonical counts + me flags
+        await loadReactions(noteId);
 
-                if (!response.ok) throw new Error('Failed to add reaction');
-                await loadReactions(noteId);
-
-            } catch (error) {
-                console.error('Error adding reaction:', error);
-            }
-            clickTimer = null;
-        }, 250); 
+    } catch (err) {
+        console.error('Error toggling reaction:', err);
+        // revert optimistic
+        if (wasMine) {
+            element.classList.add('my-reaction');
+            count = count + 1;
+        } else {
+            element.classList.remove('my-reaction');
+            count = Math.max(0, count - 1);
+        }
+        if (countSpan) countSpan.textContent = count;
     }
 }
+
+// Khi khởi tạo reaction picker cho mỗi note (thay cái cũ)
+function initializeNoteFeatures(noteDisplay, noteId) {
+    const reactionPicker = noteDisplay.querySelector('.reaction-picker');
+    reactionPicker.innerHTML = ''; // đảm bảo rỗng trước khi thêm
+    emojiList.forEach(emoji => {
+        const button = document.createElement('button');
+        button.className = 'emoji-btn';
+        button.textContent = emoji;
+        // Khi user chọn emoji từ picker -> toggle (POST) ngay
+        button.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleReaction(noteId, emoji, createOrFindTempReactionButton(noteDisplay, emoji));
+        });
+        reactionPicker.appendChild(button);
+    });
+
+    // ... keep the rest of initializeNoteFeatures (reply, picker toggle, etc)
+    const addReactionBtn = noteDisplay.querySelector('.add-reaction');
+    addReactionBtn.onclick = (e) => {
+        e.stopPropagation();
+        const picker = noteDisplay.querySelector('.reaction-picker');
+        picker.style.display = picker.style.display === 'grid' ? 'none' : 'grid';
+    };
+
+    // reply handlers follow unchanged (copy existing code)
+    const replyButton = noteDisplay.querySelector('.reply-button');
+    const replyForm = noteDisplay.querySelector('.reply-form');
+    const replyInput = noteDisplay.querySelector('.reply-input');
+    const replySubmit = noteDisplay.querySelector('.reply-submit');
+    const replyCancel = noteDisplay.querySelector('.reply-cancel');
+
+    replyButton.onclick = () => {
+        replyForm.style.display = 'block';
+        replyInput.focus();
+    };
+
+    replyCancel.onclick = () => {
+        replyForm.style.display = 'none';
+        replyInput.value = '';
+    };
+
+    replySubmit.onclick = () => {
+        const replyText = replyInput.value.trim();
+        if (replyText) {
+            addReply(noteId, replyText);
+            replyInput.value = '';
+            replyForm.style.display = 'none';
+        }
+    };
+}
+
+// Helper: when user clicks an emoji in picker we may not yet have a reaction button in DOM.
+// Create a temporary reaction button element (not inserted) so toggleReaction can update UI instantly.
+// After toggling we call loadReactions(noteId) to rebuild canonical DOM.
+function createOrFindTempReactionButton(noteDisplay, emoji) {
+    const reactionsContainer = noteDisplay.querySelector('.reactions');
+    let existing = Array.from(reactionsContainer.children).find(el => el.textContent && el.textContent.includes(emoji));
+    if (existing) return existing;
+
+    // create a temporary element (not appended) with required structure
+    const temp = document.createElement('button');
+    temp.type = 'button';
+    temp.className = 'reaction';
+    temp.innerHTML = `${emoji} <span class="reaction-count">0</span>`;
+    return temp;
+}
+
 
 document.addEventListener('click', (e) => {
     const reactionPickers = document.querySelectorAll('.reaction-picker');
