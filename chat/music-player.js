@@ -4,6 +4,7 @@ let isLicensed = localStorage.getItem('licensedAccess') === '1' || false;
 let songs = [];
 
 document.addEventListener('DOMContentLoaded', async function () {
+
     const audio = document.getElementById('audio');
     const playButton = document.getElementById('play-button');
     const seekBar = document.querySelector('.seek-bar');
@@ -227,52 +228,19 @@ document.addEventListener('DOMContentLoaded', async function () {
         renderSongSuggestions(query);
     });
 
-searchInput.addEventListener("input", async function () {
-  const raw = searchInput.value.trim();
-
-  // Nếu gõ /lock → khoá lại
-  if (raw.toLowerCase() === "/lock") {
-    isLicensed = false;
-    token = null;
-    localStorage.removeItem("licensedAccess");
-    localStorage.removeItem("music_token");
-    songs = [...freeSongs];
-    searchInput.value = "";
-    renderSongSuggestions("");
-    songSuggestions.innerHTML = "<div>🔒 Đã khoá, chỉ còn nhạc Free.</div>";
-    return;
-  }
-
-  // Nếu nhập mật khẩu
-  if (raw.length > 0) {
-    try {
-      const resp = await fetch(`${API_BASE}/api/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: raw })
-      });
-      if (resp.ok) {
-        const data = await resp.json();
-        token = data.token;
-        isLicensed = true;
-        localStorage.setItem("licensedAccess", "1");
-        localStorage.setItem("music_token", token);
-        searchInput.value = "";
-
-        await loadLicensedCatalog();
-        renderSongSuggestions("");
-        songSuggestions.innerHTML = "<div>✅ Đã mở kho nhạc bản quyền!</div>";
-        return;
-      }
-    } catch (e) {
-      console.error("Login error:", e);
-    }
-  }
-
-  // Nếu chỉ là tìm kiếm
-  renderSongSuggestions(raw.toLowerCase());
-});
-
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            const firstSuggestion = songSuggestions.querySelector('.song-item');
+            if (firstSuggestion) {
+                firstSuggestion.click(); // Simulate click on the first suggestion
+            }
+            // hideSearch() is called by the click event on song-item,
+            // or we can call it here if no song is selected.
+            if (!firstSuggestion) {
+                hideSearch();
+            }
+        }
+    });
 
     function renderSongSuggestions(query) {
         const filteredSuggestions = songs.filter(song => 
@@ -489,39 +457,24 @@ searchInput.addEventListener("input", async function () {
     });
 
     function playCurrentSong() {
-    if (songs.length === 0) {
-        songTitleElement.textContent = "Không có bài hát";
-        audio.src = "";
-        playButton.innerHTML = '<i class="fas fa-play"></i>';
-        return;
-    }
-
-    const song = songs[currentSongIndex];
-    songTitleElement.textContent = song.title;
-
-    if (song.id && isLicensed && token) {
-        // 🔒 Nếu là nhạc bản quyền → stream qua backend
-        audio.src = `${API_BASE}/api/stream/${encodeURIComponent(song.id)}?t=${encodeURIComponent(token)}`;
-    } else if (song.src) {
-        // 🎵 Nếu là nhạc free → phát trực tiếp
+        if (songs.length === 0) {
+            songTitleElement.textContent = "Không có bài hát";
+            audio.src = "";
+            playButton.innerHTML = '<i class="fas fa-play"></i>';
+            return;
+        }
+        const song = songs[currentSongIndex];
         audio.src = song.src;
-    } else {
-        console.error("Bài hát không hợp lệ:", song);
-        alert("Không thể phát bài hát này.");
-        playButton.innerHTML = '<i class="fas fa-play"></i>';
-        return;
+        songTitleElement.textContent = song.title;
+        audio.load(); // Load the new audio
+        audio.play().then(() => {
+            playButton.innerHTML = '<i class="fas fa-pause"></i>';
+        }).catch(error => {
+            console.error("Error playing audio:", error);
+            alert("Không thể phát bài hát. Trình duyệt có thể chặn tự động phát hoặc file bị lỗi.");
+            playButton.innerHTML = '<i class="fas fa-play"></i>';
+        });
     }
-
-    audio.load(); // Load audio mới
-    audio.play().then(() => {
-        playButton.innerHTML = '<i class="fas fa-pause"></i>';
-    }).catch(error => {
-        console.error("Error playing audio:", error);
-        alert("Không thể phát bài hát. Trình duyệt có thể chặn tự động phát hoặc file bị lỗi.");
-        playButton.innerHTML = '<i class="fas fa-play"></i>';
-    });
-}
-
 
     // Initial setup when the page loads
     document.addEventListener('DOMContentLoaded', () => {
