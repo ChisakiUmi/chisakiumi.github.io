@@ -479,49 +479,24 @@ async function addReaction(noteId, emoji) {
 const clickTimers = {}; // { [noteId]: timeoutId }
 
 async function handleReactionClick(noteId, emoji) {
-    // nếu đã có timer => đây là double click -> xóa reaction
-    if (clickTimers[noteId]) {
-        clearTimeout(clickTimers[noteId]);
-        clickTimers[noteId] = null;
+    try {
+        const response = await fetch(`${API_BASE}/api/reactions/${noteId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ emoji, user_id })
+        });
 
-        try {
-            const response = await fetch(`${API_BASE}/api/reactions/${noteId}`, {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ emoji, user_id })
-            });
-
-            if (!response.ok) {
-                const err = await response.text();
-                throw new Error('Failed to remove reaction: ' + err);
-            }
-            await loadReactions(noteId);
-        } catch (error) {
-            console.error('Error removing reaction:', error);
+        if (!response.ok) {
+            const err = await response.text();
+            throw new Error('Failed to toggle reaction: ' + err);
         }
-    } else {
-        // single click (chờ threshold để quyết định có phải double hay không)
-        clickTimers[noteId] = setTimeout(async () => {
-            try {
-                const response = await fetch(`${API_BASE}/api/reactions/${noteId}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ emoji, user_id })
-                });
 
-                if (!response.ok) {
-                    const err = await response.text();
-                    throw new Error('Failed to add reaction: ' + err);
-                }
-                await loadReactions(noteId);
-            } catch (error) {
-                console.error('Error adding reaction:', error);
-            } finally {
-                clickTimers[noteId] = null;
-            }
-        }, 250); // threshold 250ms
+        await loadReactions(noteId);
+    } catch (error) {
+        console.error('Error toggling reaction:', error);
     }
 }
+
 
 
 document.addEventListener('click', (e) => {
