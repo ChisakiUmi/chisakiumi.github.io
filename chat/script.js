@@ -1,11 +1,11 @@
 const API_BASE = "https://backend-oik0.onrender.com";
 let selectedFiles = [];
 
-let user_id = localStorage.getItem("user_id");
-if (!user_id) {
-  user_id = "u-" + Date.now() + "-" + Math.floor(Math.random() * 100000);
-  localStorage.setItem("user_id", user_id);
-}
+const user_id = localStorage.getItem('user_id') || (function(){
+  const id = 'u-' + Date.now() + '-' + Math.floor(Math.random() * 100000);
+  localStorage.setItem('user_id', id);
+  return id;
+})();
 
 document.addEventListener('DOMContentLoaded', () => {
     loadNotes();
@@ -14,31 +14,31 @@ document.addEventListener('DOMContentLoaded', () => {
 document.getElementById('submit-note').addEventListener('click', async function(event) {
     event.preventDefault();
     const noteInput = document.getElementById('note-input');
-    noteInput.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = (this.scrollHeight) + 'px';
-    });
+    // chỉ gán event resize 1 lần thôi (nếu muốn) - nhưng giữ như cũ ok
     const noteText = noteInput.value.trim();
     if (noteText || selectedFiles.length > 0) {
         const noteId = Date.now();
-        const timestamp = new Date().getTime();
-        const mediaFiles = await Promise.all(selectedFiles.map(async file => {
-            const base64 = await fileToBase64(file);
-            return {
-                type: file.type,
-                data: base64
-            };
-        }));
-        saveNoteToAPI(noteText, mediaFiles, noteId, timestamp);
-        noteInput.value = '';
-        selectedFiles = [];
-        document.getElementById('media-preview').innerHTML = '';
+        const timestamp = Date.now();
+
+        // gọi và chờ lưu xong trước khi reset UI
+        try {
+            await saveNoteToAPI(noteText, selectedFiles, noteId, timestamp);
+            // reset UI chỉ khi lưu thành công
+            noteInput.value = '';
+            selectedFiles = [];
+            document.getElementById('media-preview').innerHTML = '';
+        } catch (err) {
+            console.error('Không thể lưu ghi chú:', err);
+            alert('Lưu ghi chú thất bại. Thử lại sau.');
+        }
     }
 });
 
-async function saveNoteToAPI(noteText, mediaFiles, noteId, timestamp) {
+
+async function saveNoteToAPI(noteText, files = [], noteId, timestamp) {
     try {
-        const mediaURLs = await Promise.all(selectedFiles.map(async file => {
+        // upload từng file (nếu có)
+        const mediaURLs = await Promise.all((files || []).map(async file => {
             const formData = new FormData();
             formData.append('file', file);
 
@@ -48,13 +48,15 @@ async function saveNoteToAPI(noteText, mediaFiles, noteId, timestamp) {
             });
 
             if (!response.ok) {
-                throw new Error('Lỗi tải lên media');
+                const text = await response.text();
+                throw new Error('Lỗi tải lên media: ' + text);
             }
 
             const data = await response.json();
             return { url: data.url, type: file.type };
         }));
 
+        // gửi note kèm media URLs đến backend
         const response = await fetch(`${API_BASE}/api/notes`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -67,18 +69,19 @@ async function saveNoteToAPI(noteText, mediaFiles, noteId, timestamp) {
         });
 
         if (!response.ok) {
-            throw new Error('Lưu ghi chú không thành công');
+            const err = await response.text();
+            throw new Error('Lưu ghi chú không thành công: ' + err);
         }
 
         const data = await response.json();
         console.log('Ghi chú đã được lưu:', data);
         addNoteToDisplay(noteText, mediaURLs, noteId, timestamp);
-
+        return data;
     } catch (error) {
         console.error('Lỗi khi lưu ghi chú:', error);
+        throw error;
     }
 }
-
 
 async function loadNotes() {
     try {
@@ -165,7 +168,7 @@ function initializeNoteFeatures(noteDisplay, noteId) {
         const button = document.createElement('button');
         button.className = 'emoji-btn';
         button.textContent = emoji;
-        button.onclick = () => handleReactionClick(noteId, emoji, user_id);
+        button.onclick = () => handleReactionClick(noteId, emoji);;
         reactionPicker.appendChild(button);
     });
 
@@ -430,9 +433,9 @@ async function loadReplies(noteId) {
 
 async function loadReactions(noteId) {
     try {
-        const response = await fetch(`${API_BASE}/api/reactions/${noteId}`);
+        const response = await fetch(`${API_BASE}/api/reactions/${noteId}?user_id=${encodeURIComponent(user_id)}`);
         if (!response.ok) throw new Error('Failed to load reactions');
-        
+
         const reactions = await response.json();
         const note = document.querySelector(`[data-note-id="${noteId}"]`);
         if (!note) return;
@@ -444,8 +447,9 @@ async function loadReactions(noteId) {
             const count = reaction.count || 1;
             const reactionElement = document.createElement('span');
             reactionElement.className = 'reaction';
+            if (reaction.me) reactionElement.classList.add('my-reaction'); // CSS class để highlight
             reactionElement.innerHTML = `${reaction.emoji} <span class="reaction-count">${count}</span>`;
-            reactionElement.onclick = () => handleReactionClick(noteId, reaction.emoji, user_id);
+            reactionElement.onclick = () => handleReactionClick(noteId, reaction.emoji);
             reactionsContainer.appendChild(reactionElement);
         });
 
@@ -453,7 +457,6 @@ async function loadReactions(noteId) {
         console.error('Error loading reactions:', error);
     }
 }
-
 
 async function addReaction(noteId, emoji) {
     try {
@@ -472,12 +475,14 @@ async function addReaction(noteId, emoji) {
     }
 }
 
-let clickTimer = null;
+// timers theo noteId để tránh xung đột giữa các note
+const clickTimers = {}; // { [noteId]: timeoutId }
 
-async function handleReactionClick(noteId, emoji, user_id) {
-    if (clickTimer) {
-        clearTimeout(clickTimer);
-        clickTimer = null;
+async function handleReactionClick(noteId, emoji) {
+    // nếu đã có timer => đây là double click -> xóa reaction
+    if (clickTimers[noteId]) {
+        clearTimeout(clickTimers[noteId]);
+        clickTimers[noteId] = null;
 
         try {
             const response = await fetch(`${API_BASE}/api/reactions/${noteId}`, {
@@ -486,16 +491,17 @@ async function handleReactionClick(noteId, emoji, user_id) {
                 body: JSON.stringify({ emoji, user_id })
             });
 
-            if (!response.ok) throw new Error('Failed to remove reaction');
+            if (!response.ok) {
+                const err = await response.text();
+                throw new Error('Failed to remove reaction: ' + err);
+            }
             await loadReactions(noteId);
-
         } catch (error) {
             console.error('Error removing reaction:', error);
         }
-
     } else {
-        
-        clickTimer = setTimeout(async () => {
+        // single click (chờ threshold để quyết định có phải double hay không)
+        clickTimers[noteId] = setTimeout(async () => {
             try {
                 const response = await fetch(`${API_BASE}/api/reactions/${noteId}`, {
                     method: 'POST',
@@ -503,16 +509,20 @@ async function handleReactionClick(noteId, emoji, user_id) {
                     body: JSON.stringify({ emoji, user_id })
                 });
 
-                if (!response.ok) throw new Error('Failed to add reaction');
+                if (!response.ok) {
+                    const err = await response.text();
+                    throw new Error('Failed to add reaction: ' + err);
+                }
                 await loadReactions(noteId);
-
             } catch (error) {
                 console.error('Error adding reaction:', error);
+            } finally {
+                clickTimers[noteId] = null;
             }
-            clickTimer = null;
-        }, 250); 
+        }, 250); // threshold 250ms
     }
 }
+
 
 document.addEventListener('click', (e) => {
     const reactionPickers = document.querySelectorAll('.reaction-picker');
