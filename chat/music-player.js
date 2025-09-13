@@ -26,10 +26,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const avatarPlaceholder = document.getElementById('avatar-placeholder');
 
 
-    const freeSongs = [
-        { title: "Bad Apple", artist: "Touhou", src: "music/Bad Apple.mp3" },
-        { title: "LAST NIGHT", artist: "BLACKLIONS", src: "music/LAST NIGHT.mp3" }
-];
+    const freeSongs = [ ];
     let currentSongIndex = 0;
     songs = [...freeSongs];
     if (isLicensed && token) {
@@ -525,3 +522,18 @@ searchInput.addEventListener("input", async function () {
     });
 }
 
+
+    // Initial setup when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+        if (songs.length > 0) {
+            // Set initial song source and title
+            audio.src = songs[currentSongIndex].src;
+            songTitleElement.textContent = songs[currentSongIndex].title;
+            // Preload metadata to get duration and update total time
+            audio.load(); 
+        } else {
+            songTitleElement.textContent = "Không có bài hát";
+            totalTimeSpan.textContent = "0:00";
+        }
+    });
+});
