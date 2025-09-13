@@ -525,18 +525,3 @@ searchInput.addEventListener("input", async function () {
     });
 }
 
-
-    // Initial setup when the page loads
-    document.addEventListener('DOMContentLoaded', () => {
-        if (songs.length > 0) {
-            // Set initial song source and title
-            audio.src = songs[currentSongIndex].src;
-            songTitleElement.textContent = songs[currentSongIndex].title;
-            // Preload metadata to get duration and update total time
-            audio.load(); 
-        } else {
-            songTitleElement.textContent = "Không có bài hát";
-            totalTimeSpan.textContent = "0:00";
-        }
-    });
-});
