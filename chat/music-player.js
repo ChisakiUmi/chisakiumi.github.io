@@ -26,7 +26,10 @@ document.addEventListener('DOMContentLoaded', async function () {
     const avatarPlaceholder = document.getElementById('avatar-placeholder');
 
 
-    const freeSongs = [ ];
+    const freeSongs = [
+        { title: "Bad Apple", artist: "Touhou", src: "music/Bad Apple.mp3" },
+        { title: "LAST NIGHT", artist: "BLACKLIONS", src: "music/LAST NIGHT.mp3" }
+];
     let currentSongIndex = 0;
     songs = [...freeSongs];
     if (isLicensed && token) {
