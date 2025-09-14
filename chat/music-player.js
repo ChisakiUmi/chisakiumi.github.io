@@ -1,10 +1,64 @@
 const API_BASE = "https://backend-oik0.onrender.com"; 
-let token = localStorage.getItem('music_token') || null;
-let isLicensed = localStorage.getItem('licensedAccess') === '1' || false;
+let token = localStorage.getItem("music_token") || null;
+let isLicensed = localStorage.getItem("licensedAccess") === "1";
 let songs = [];
+let isPlaying = false;
+let searchTimer = null;
+
+const $ = id => document.getElementById(id);
+
+const setMsg = txt => {
+  const m = $('messages');
+  if (m) m.textContent = txt || '';
+};
+
+const fmtTime = (s = 0) => {
+  s = Math.floor(s || 0);
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${m}:${String(sec).padStart(2,'0')}`;
+};
+
+const safeJson = async (res) => {
+  try { return await res.json(); } catch { return null; }
+};
+
+function saveToken(t) {
+  token = t || null;
+  if (token) {
+    localStorage.setItem("music_token", token);
+    localStorage.setItem("licensedAccess", "1");
+    isLicensed = true;
+  } else {
+    localStorage.removeItem("music_token");
+    localStorage.removeItem("licensedAccess");
+    isLicensed = false;
+  }
+}
+
+async function loadLicensedCatalog() {
+  if (!token) return false;
+  try {
+    const res = await fetch(`${API_BASE}/api/catalog?t=${encodeURIComponent(token)}`);
+    if (!res.ok) {
+      saveToken(null);
+      setMsg("Token không hợp lệ hoặc hết hạn. Vui lòng nhập lại mật khẩu.");
+      return false;
+    }
+    const data = await safeJson(res);
+    if (!data || !Array.isArray(data.licensedSongs)) return false;
+
+    songs = [...data.licensedSongs, ...freeSongs];
+    return true;
+  } catch (err) {
+    console.error("loadLicensedCatalog error", err);
+    setMsg("Không thể tải kho nhạc bản quyền.");
+    return false;
+  }
+}
+
 
 document.addEventListener('DOMContentLoaded', async function () {
-
     const audio = document.getElementById('audio');
     const playButton = document.getElementById('play-button');
     const seekBar = document.querySelector('.seek-bar');
@@ -27,38 +81,45 @@ document.addEventListener('DOMContentLoaded', async function () {
     const avatarPlaceholder = document.getElementById('avatar-placeholder');
 
 
-    const freeSongs = [ ];
+    const freeSongs = [
+        { title: "Bad Apple", artist: "Touhou", src: "music/Bad Apple.mp3" },
+        { title: "LAST NIGHT", artist: "BLACKLIONS", src: "music/LAST NIGHT.mp3" }
+];
     let currentSongIndex = 0;
     songs = [...freeSongs];
     if (isLicensed && token) {
         await loadLicensedCatalog();
     }
-    renderSongSuggestions("");
-    function renderSongSuggestions(query) {
-        songSuggestions.innerHTML = "";
-        songs.filter(s => s.title.toLowerCase().includes(query)).forEach((s, i) => {
-            const div = document.createElement("div");
-            div.className = "song-item";
-            div.textContent = `${s.title} - ${s.artist || ""}`;
-            div.onclick = () => { currentSongIndex = i; playCurrentSong(); };
-            songSuggestions.appendChild(div);
-        });
-    }
+function renderSuggestions(q) {
+  const query = (q || '').toLowerCase();
+  songSuggestions.innerHTML = '';
 
-    async function loadLicensedCatalog() {
-        try {
-            const resp = await fetch(`${API_BASE}/api/catalog?t=${token}`);
-            if (resp.ok) {
-                const data = await resp.json();
-                if (Array.isArray(data.licensedSongs)) {
-                    songs = [...data.licensedSongs, ...freeSongs];
-                }
-            }
-        } catch (err) {
-            console.error("Load catalog error:", err);
-        }
-    }
+  const list = songs.filter(s =>
+    s.title.toLowerCase().includes(query) ||
+    (s.artist && s.artist.toLowerCase().includes(query))
+  );
 
+  if (list.length === 0) {
+    const no = document.createElement('div');
+    no.className = 'song-item';
+    no.textContent = 'Không tìm thấy bài hát.';
+    songSuggestions.appendChild(no);
+    return;
+  }
+
+  list.forEach((s) => {
+    const i = songs.indexOf(s);
+    const div = document.createElement('div');
+    div.className = 'song-item';
+    div.textContent = `${s.title}${s.artist ? ' - ' + s.artist : ''}`;
+    div.onclick = () => { currentIndex = i; playAtIndex(i); };
+    songSuggestions.appendChild(div);
+  });
+
+  const badge = $('accessBadge');
+  if (badge) badge.textContent = `Chế độ: ${isLicensed ? 'Licensed' : 'Free'}`;
+}
+});
 
     // --- Audio Playback Controls ---
     playButton.addEventListener('click', function() {
@@ -223,10 +284,49 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     });
 
-    searchInput.addEventListener('input', function() {
-        const query = searchInput.value.toLowerCase();
-        renderSongSuggestions(query);
-    });
+searchInput.addEventListener('input', () => {
+    const raw = searchInput.value.trim();
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(async () => {
+        // Nếu gõ /lock thì khoá lại
+        if (raw.toLowerCase() === '/lock') {
+            saveToken(null);
+            songs = [...freeSongs];
+            renderSongSuggestions('');
+            searchInput.value = '';
+            alert('Đã khóa kho nhạc bản quyền.');
+            return;
+        }
+
+        // Nếu chưa unlock → thử login
+        if (!isLicensed && raw.length > 0) {
+            try {
+                const resp = await fetch(`${API_BASE}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: raw })
+                });
+                if (resp.ok) {
+                    const j = await resp.json();
+                    if (j && j.token) {
+                        saveToken(j.token);
+                        searchInput.value = '';
+                        alert('Đã mở kho nhạc bản quyền!');
+                        const ok = await loadLicensedCatalog();
+                        if (ok) renderSongSuggestions('');
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.error('login error', err);
+            }
+        }
+
+        // Nếu chỉ là tìm kiếm nhạc
+        renderSongSuggestions(raw.toLowerCase());
+    }, 300);
+});
+
 
     searchInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
@@ -242,30 +342,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     });
 
-    function renderSongSuggestions(query) {
-        const filteredSuggestions = songs.filter(song => 
-            song.title.toLowerCase().includes(query) || 
-            song.artist.toLowerCase().includes(query)
-        );
-        
-        songSuggestions.innerHTML = '';
-        if (filteredSuggestions.length === 0 && query !== '') {
-            songSuggestions.innerHTML = '<div class="song-item" style="cursor: default; opacity: 0.7;">Không tìm thấy bài hát nào.</div>';
-        } else {
-            filteredSuggestions.forEach((song, index) => {
-                const item = document.createElement('div');
-                item.className = 'song-item';
-                item.textContent = `${song.title} - ${song.artist}`;
-                item.dataset.index = index; // Store song index
-                item.addEventListener('click', function() {
-                    currentSongIndex = parseInt(this.dataset.index); // Update current song index
-                    playCurrentSong();
-                    hideSearch(); // Hide search after selection
-                });
-                songSuggestions.appendChild(item);
-            });
-        }
-    }
 
     // --- Settings Panel Functionality ---
     const settingsToggle = document.getElementById('settings-toggle');
@@ -456,37 +532,48 @@ document.addEventListener('DOMContentLoaded', async function () {
         playCurrentSong();
     });
 
-    function playCurrentSong() {
-        if (songs.length === 0) {
-            songTitleElement.textContent = "Không có bài hát";
-            audio.src = "";
-            playButton.innerHTML = '<i class="fas fa-play"></i>';
-            return;
-        }
-        const song = songs[currentSongIndex];
-        audio.src = song.src;
-        songTitleElement.textContent = song.title;
-        audio.load(); // Load the new audio
-        audio.play().then(() => {
-            playButton.innerHTML = '<i class="fas fa-pause"></i>';
-        }).catch(error => {
-            console.error("Error playing audio:", error);
-            alert("Không thể phát bài hát. Trình duyệt có thể chặn tự động phát hoặc file bị lỗi.");
-            playButton.innerHTML = '<i class="fas fa-play"></i>';
-        });
+function playCurrentSong() {
+    if (songs.length === 0) {
+        songTitleElement.textContent = "Không có bài hát";
+        audio.src = "";
+        playButton.innerHTML = '<i class="fas fa-play"></i>';
+        return;
     }
 
-    // Initial setup when the page loads
-    document.addEventListener('DOMContentLoaded', () => {
-        if (songs.length > 0) {
-            // Set initial song source and title
-            audio.src = songs[currentSongIndex].src;
-            songTitleElement.textContent = songs[currentSongIndex].title;
-            // Preload metadata to get duration and update total time
-            audio.load(); 
-        } else {
-            songTitleElement.textContent = "Không có bài hát";
-            totalTimeSpan.textContent = "0:00";
-        }
+    const song = songs[currentSongIndex];
+    if (!song) return;
+
+    // Nếu là bài bản quyền (có id + token)
+    if (song.id && isLicensed && token) {
+        audio.src = `${API_BASE}/api/stream/${encodeURIComponent(song.id)}?t=${encodeURIComponent(token)}`;
+    }
+    // Nếu là nhạc free
+    else if (song.src && !song.id) {
+        audio.src = song.src;
+    }
+    // Nếu có src nội bộ và licensed
+    else if (song.src && isLicensed && token) {
+        audio.src = `${API_BASE}/api/stream-local?path=${encodeURIComponent(song.src)}&t=${encodeURIComponent(token)}`;
+    }
+    else {
+        console.warn("Bài không khả dụng:", song);
+        songTitleElement.textContent = "Không thể phát bài này";
+        playButton.innerHTML = '<i class="fas fa-play"></i>';
+        return;
+    }
+}
+
+
+    // Cập nhật tiêu đề
+    songTitleElement.textContent = song.title;
+
+    // Load và phát nhạc
+    audio.load();
+    audio.play().then(() => {
+        playButton.innerHTML = '<i class="fas fa-pause"></i>';
+    }).catch(error => {
+        console.error("Error playing audio:", error);
+        alert("Không thể phát bài hát. Trình duyệt có thể chặn tự động phát hoặc file bị lỗi.");
+        playButton.innerHTML = '<i class="fas fa-play"></i>';
     });
-});
+}
