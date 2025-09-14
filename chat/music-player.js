@@ -561,8 +561,6 @@ function playCurrentSong() {
         playButton.innerHTML = '<i class="fas fa-play"></i>';
         return;
     }
-}
-
 
     // Cập nhật tiêu đề
     songTitleElement.textContent = song.title;
