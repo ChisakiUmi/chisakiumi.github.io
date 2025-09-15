@@ -1,4 +1,3 @@
-const API_BASE = "https://backend-oik0.onrender.com"; 
 let token = localStorage.getItem("music_token") || null;
 let isLicensed = localStorage.getItem("licensedAccess") === "1";
 let searchTimer = null;
