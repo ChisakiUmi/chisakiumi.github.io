@@ -1,6 +1,16 @@
-// music-player.js (cho chức năng trình phát nhạc)
+const API_BASE = "https://backend-oik0.onrender.com"; 
+let token = localStorage.getItem("music_token") || null;
+let isLicensed = localStorage.getItem("licensedAccess") === "1";
+let searchTimer = null;
+let currentSongIndex = 0;
 
-document.addEventListener('DOMContentLoaded', () => {
+const freeSongs = [
+  { title: "Bad Apple", artist: "Touhou", src: "music/Bad Apple.mp3" },
+  { title: "LAST NIGHT", artist: "BLACKLIONS", src: "music/LAST NIGHT.mp3" }
+];
+let songs = [...freeSongs];
+
+document.addEventListener('DOMContentLoaded', async () => {
     const audio = document.getElementById('audio');
     const playButton = document.getElementById('play-button');
     const seekBar = document.querySelector('.seek-bar');
@@ -22,45 +32,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const avatarWrapper = document.querySelector('.avatar-wrapper');
     const avatarPlaceholder = document.getElementById('avatar-placeholder');
 
+   if (isLicensed && token) {
+    await loadLicensedCatalog();
+   }
 
-    // Sample song data - IMPORTANT: Using public URLs for testing.
-    // Replace with your actual audio file paths if you host them locally.
-    const songs = [
-        { title: "Bạch Nguyệt Quang", artist: "Táo", src: "music/Bạch Nguyệt Quang.mp3" },
-        { title: "09 Chuyện Thường", artist: "Ngọt Band", src: "music/09 Chuyện Thường.mp3" },
-        { title: "Tình Cờ Yêu Em", artist: "Kuun Đức Nam", src: "music/TÌNH CỜ YÊU EM.mp3" },
-        { title: "Tương Tư", artist: "CLOW X FLEPY", src: "music/TƯƠNG TƯ.mp3" },
-        { title: "Tháng Tư Là Lời...", artist: "Hà Anh Tuấn", src: "music/Tháng Tư Là Lời Nói Dối Của Em.mp3" },
-        { title: "Feel At Home", artist: "Bray", src: "music/Feel At Home.mp3"},
-        { title: "Bình Yên", artist: "VŨ ft Binz", src: "music/Bình Yên.mp3"},
-        { title: "Thanh Xuân", artist: "Da LAB", src: "music/Thanh Xuân.mp3"},
-        { title: "ĐỢI", artist: "52Hz", src: "music/ĐỢI.mp3"},
-        { title: "Ngày ấy", artist: "Em Ellata", src: "music/Ngày ấy.mp3"},
-        { title: "Bể Cá", artist: "Lope Dope", src: "music/BỂ CÁ.mp3"},
-        { title: "Váy Hoa Nhí", artist: "Minh Châu", src: "music/Váy Hoa Nhí.mp3"},
-        { title: "Nghe kể năm 90s", artist: "Ân ngờ ft.Suzie MK", src: "music/Nghe kể năm 90s.mp3"},
-        { title: "CHUYỂN KÊNH", artist: "Ngọt", src: "music/CHUYỂN KÊNH.mp3"},
-        { title: "Em dạo này", artist: "Ngọt", src: "music/Em dạo này.mp3"},
-        { title: "Thấy Chưa", artist: "Ngọt", src: "music/Thấy Chưa.mp3"},
-        { title: "BÔNG HOA CHẲNG...", artist: "NHƯ VIỆT", src: "music/BÔNG HOA CHẲNG THUỘC VỀ TA .mp3"},
-        { title: "Trở về lối đi xưa", artist: "Notor", src: "music/Old Town Road tiếng việt.mp3"},
-        { title: "Phép Màu", artist: "Minh Tốc", src: "music/Phép Màu.mp3"},
-        { title: "Ojos Tristes", artist: "Selena Gomez", src: "music/Ojos Tristes.mp3"},
-        { title: "Stay With Me", artist: "Miki Matsubara", src: "music/Stay With Me.mp3"},
-        { title: "Blue Tequile", artist: "Táo", src: "music/Blue Tequile.mp3"},
-        { title: "Cry for Me", artist: "Michita ft 愛海", src: "music/Cry for me.mp3"},
-        { title: "Truy tìm giắc mơ đó", artist: "YOASOBI", src: "music/あの夢をなぞって .mp3"},
-        { title: "Tabun", artist: "YOASOBI", src: "music/たふん.mp3"},
-        { title: "Lemon", artist: "Kenshi Yonezu", src: "music/Lemon.mp3"},
-        { title: "Rokudenashi", artist: "ロクデナシ「愛が灯る」", src: "music/Rokudenashi.mp3"},
-        { title: "Sukidakara", artist: "『ユイカ』", src: "music/Sukidakara.mp3"},
-        { title: "Harehare Ya", artist: "Sou", src: "music/Harehare Ya.mp3"},
-        { title: "Uchiagehanabi", artist: "", src: "music/Uchiagehanabi.mp3"},
-        { title: "Bad Apple", artist: "Touhou", src: "music/Bad Apple.mp3"},
-        { title: "Tình đắng như ly...", artist: "nân. x Ngơ", src: "music/tình đắng như ly cà phê.mp3"},
-        { title: "LAST NIGHT", artist: "BLACKLIONS", src: "music/LAST NIGHT.mp3"},
-    ];
-    let currentSongIndex = 0; // Keep track of the current song in the playlist
+function saveToken(t) {
+  token = t || null;
+  if (token) {
+    localStorage.setItem("music_token", token);
+    localStorage.setItem("licensedAccess", "1");
+    isLicensed = true;
+  } else {
+    localStorage.removeItem("music_token");
+    localStorage.removeItem("licensedAccess");
+    isLicensed = false;
+  }
+  const badge = $('accessBadge');
+  if (badge) badge.textContent = `Chế độ: ${isLicensed ? 'Licensed' : 'Free'}`
+}
+
+async function loadLicensedCatalog() {
+  if (!token) return false;
+  try {
+    const res = await fetch(`${API_BASE}/api/catalog?t=${encodeURIComponent(token)}`);
+    if (!res.ok) { saveToken(null); return false; }
+    const data = await res.json();
+    if (!data || !Array.isArray(data.licensedSongs)) return false;
+    songs = [...data.licensedSongs, ...freeSongs];
+    return true;
+  } catch (err) {
+    console.error("loadLicensedCatalog error", err);
+    return false;
+  }
+}
 
     // --- Audio Playback Controls ---
     playButton.addEventListener('click', function() {
@@ -104,11 +108,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    audio.onerror = function() {
-        console.error("Error loading audio:", audio.error);
-        alert("Không thể tải bài hát. Vui lòng kiểm tra đường dẫn file hoặc kết nối mạng.");
-        playButton.innerHTML = '<i class="fas fa-play"></i>'; // Reset button
-    };
+audio.onerror = function() {
+  console.error("Error loading audio:", audio.error);
+
+  // Nếu lỗi liên quan token hết hạn hoặc không hợp lệ
+  if (audio.error && audio.error.code === 4 && isLicensed) {
+    alert("Phiên bản quyền đã hết hạn. Quay lại chế độ Free.");
+    saveToken(null); // reset token
+    songs = [...freeSongs];
+    renderSongSuggestions('');
+  } else {
+    alert("Không thể tải bài hát. Vui lòng kiểm tra đường dẫn file hoặc kết nối mạng.");
+  }
+
+  playButton.innerHTML = '<i class="fas fa-play"></i>'; // Reset button
+};
+
 
     seekBar.addEventListener('input', function() {
         if (!isNaN(audio.duration) && audio.duration > 0) {
@@ -151,20 +166,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Hàm mới để quản lý hiển thị avatar và placeholder
-    function updateAvatarDisplay() {
-        const savedAvatar = localStorage.getItem('userAvatar');
-        // Kiểm tra nếu không có avatar đã lưu HOẶC avatar là ảnh mặc định (avatar.jpg)
-        // Bạn cần đảm bảo 'avatar.jpg' là đường dẫn chính xác đến ảnh mặc định của bạn
-        if (!savedAvatar || savedAvatar.includes('avatar.jpg')) {
-            avatar.src = 'avatar.jpg'; // Đảm bảo ảnh mặc định được hiển thị
-            avatarPlaceholder.classList.add('show'); // Hiển thị placeholder
-            avatar.style.opacity = '0'; // Ẩn ảnh avatar đi
-        } else {
-            avatar.src = savedAvatar;
-            avatarPlaceholder.classList.remove('show'); // Ẩn placeholder
-            avatar.style.opacity = '1'; // Hiển thị ảnh avatar
-        }
-    }
+const DEFAULT_AVATAR = 'data:image/svg+xml;utf8,' +
+  encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect width="100%" height="100%" rx="12" fill="#ddd"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#888" font-family="sans-serif" font-size="28">U</text></svg>');
+
+function updateAvatarDisplay() {
+  const savedAvatar = localStorage.getItem('userAvatar');
+  if (!savedAvatar) {
+    avatar.src = DEFAULT_AVATAR;
+    avatarPlaceholder.classList.add('show');
+    avatar.style.opacity = '0';
+  } else {
+    avatar.src = savedAvatar;
+    avatarPlaceholder.classList.remove('show');
+    avatar.style.opacity = '1';
+  }
+}
+
 
     // Load saved user info on startup
     function loadUserInfo() {
@@ -225,10 +242,52 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    searchInput.addEventListener('input', function() {
-        const query = searchInput.value.toLowerCase();
-        renderSongSuggestions(query);
-    });
+searchInput.addEventListener('input', () => {
+  const raw = searchInput.value.trim();
+  const lower = raw.toLowerCase();
+  clearTimeout(searchTimer);
+
+  searchTimer = setTimeout(async () => {
+if (raw.toLowerCase() === '/lock') {
+  saveToken(null);
+  songs = [...freeSongs];
+  renderSongSuggestions('');
+  searchInput.value = '';
+  alert('Đã khóa kho nhạc bản quyền.');
+  return;
+}
+
+
+    if (lower.startsWith('/unlock ') || lower.startsWith('/pw ')) {
+      const pw = raw.split(' ').slice(1).join(' ');
+      try {
+        const resp = await fetch(`${API_BASE}/api/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: pw })
+        });
+        if (resp.ok) {
+          const j = await resp.json();
+          if (j && j.token) {
+            saveToken(j.token);
+            searchInput.value = '';
+            alert('Đã mở kho nhạc bản quyền!');
+            const ok = await loadLicensedCatalog();
+            if (ok) renderSongSuggestions('');
+            return;
+          }
+        }
+        alert('Mật khẩu sai.');
+      } catch (err) {
+        console.error("login error", err);
+      }
+      return;
+    }
+
+    renderSongSuggestions(lower);
+  }, 300);
+});
+
 
     searchInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
@@ -243,31 +302,61 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+function renderSongSuggestions(query = '') {
+  const songSuggestionsEl = document.getElementById('song-suggestions');
+  if (!songSuggestionsEl) return;
 
-    function renderSongSuggestions(query) {
-        const filteredSuggestions = songs.filter(song => 
-            song.title.toLowerCase().includes(query) || 
-            song.artist.toLowerCase().includes(query)
-        );
-        
-        songSuggestions.innerHTML = '';
-        if (filteredSuggestions.length === 0 && query !== '') {
-            songSuggestions.innerHTML = '<div class="song-item" style="cursor: default; opacity: 0.7;">Không tìm thấy bài hát nào.</div>';
-        } else {
-            filteredSuggestions.forEach((song, index) => {
-                const item = document.createElement('div');
-                item.className = 'song-item';
-                item.textContent = `${song.title} - ${song.artist}`;
-                item.dataset.index = index; // Store song index
-                item.addEventListener('click', function() {
-                    currentSongIndex = parseInt(this.dataset.index); // Update current song index
-                    playCurrentSong();
-                    hideSearch(); // Hide search after selection
-                });
-                songSuggestions.appendChild(item);
-            });
-        }
-    }
+  const q = (query || '').toLowerCase().trim();
+  // Lọc trên toàn bộ songs (hiển thị free hoặc licensed tùy state songs hiện có)
+  const list = (songs || []).filter(s =>
+    (s.title || '').toLowerCase().includes(q) ||
+    ((s.artist || '').toLowerCase().includes(q))
+  );
+
+  songSuggestionsEl.innerHTML = '';
+
+  if (list.length === 0) {
+    const no = document.createElement('div');
+    no.className = 'song-item';
+    no.textContent = q ? 'Không tìm thấy bài hát.' : 'Danh sách trống.';
+    songSuggestionsEl.appendChild(no);
+    return;
+  }
+
+  list.forEach((s) => {
+    const div = document.createElement('div');
+    div.className = 'song-item';
+    div.textContent = `${s.title}${s.artist ? ' - ' + s.artist : ''}`;
+
+    div.addEventListener('click', () => {
+      // Tìm chính xác index trong mảng songs (không dùng index trong list)
+      const idx = (songs || []).findIndex(x =>
+        (x.id && s.id && x.id === s.id) ||
+        (x.src && s.src && x.src === s.src && x.title === s.title) ||
+        (x.title === s.title && x.artist === s.artist)
+      );
+
+      if (idx >= 0) {
+        currentSongIndex = idx;
+      } else {
+        // Nếu không tìm thấy (không nên), thêm vào playlist và phát
+        songs.push(s);
+        currentSongIndex = songs.length - 1;
+      }
+
+      // Ẩn tìm kiếm và phát nhạc
+      if (typeof hideSearch === 'function') hideSearch();
+      if (typeof playCurrentSong === 'function') playCurrentSong();
+    });
+
+    songSuggestionsEl.appendChild(div);
+  });
+
+  // Cập nhật badge trạng thái (nếu có)
+  const badge = document.getElementById('accessBadge');
+  if (badge) badge.textContent = `Chế độ: ${isLicensed ? 'Licensed' : 'Free'}`;
+}
+
 
     // --- Settings Panel Functionality ---
     const settingsToggle = document.getElementById('settings-toggle');
@@ -458,37 +547,37 @@ document.addEventListener('DOMContentLoaded', () => {
         playCurrentSong();
     });
 
-    function playCurrentSong() {
-        if (songs.length === 0) {
-            songTitleElement.textContent = "Không có bài hát";
-            audio.src = "";
-            playButton.innerHTML = '<i class="fas fa-play"></i>';
-            return;
-        }
-        const song = songs[currentSongIndex];
-        audio.src = song.src;
-        songTitleElement.textContent = song.title;
-        audio.load(); // Load the new audio
-        audio.play().then(() => {
-            playButton.innerHTML = '<i class="fas fa-pause"></i>';
-        }).catch(error => {
-            console.error("Error playing audio:", error);
-            alert("Không thể phát bài hát. Trình duyệt có thể chặn tự động phát hoặc file bị lỗi.");
-            playButton.innerHTML = '<i class="fas fa-play"></i>';
-        });
-    }
+function playCurrentSong() {
+  if (songs.length === 0) {
+    songTitleElement.textContent = "Không có bài hát";
+    audio.src = "";
+    playButton.innerHTML = '<i class="fas fa-play"></i>';
+    return;
+  }
 
-    // Initial setup when the page loads
-    document.addEventListener('DOMContentLoaded', () => {
-        if (songs.length > 0) {
-            // Set initial song source and title
-            audio.src = songs[currentSongIndex].src;
-            songTitleElement.textContent = songs[currentSongIndex].title;
-            // Preload metadata to get duration and update total time
-            audio.load(); 
-        } else {
-            songTitleElement.textContent = "Không có bài hát";
-            totalTimeSpan.textContent = "0:00";
-        }
-    });
+  const song = songs[currentSongIndex];
+  if (!song) return;
+
+  if (song.id && isLicensed && token) {
+    audio.src = `${API_BASE}/api/stream/${encodeURIComponent(song.id)}?t=${encodeURIComponent(token)}`;
+  } else if (song.src) {
+    audio.src = song.src;
+  } else {
+    console.warn("Bài không khả dụng:", song);
+    songTitleElement.textContent = "Không thể phát bài này";
+    playButton.innerHTML = '<i class="fas fa-play"></i>';
+    return;
+  }
+
+  songTitleElement.textContent = song.title;
+
+  audio.load();
+  audio.play().then(() => {
+    playButton.innerHTML = '<i class="fas fa-pause"></i>';
+  }).catch(error => {
+    console.error("Error playing audio:", error);
+    alert("Không thể phát bài hát.");
+    playButton.innerHTML = '<i class="fas fa-play"></i>';
+  });
+}
 });
