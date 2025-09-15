@@ -6,6 +6,22 @@ let isPlaying = false;
 let searchTimer = null;
 
 const $ = id => document.getElementById(id);
+const audio = document.getElementById('audio');
+const playButton = document.getElementById('play-button');
+const seekBar = document.querySelector('.seek-bar');
+const usernameInput = document.getElementById('username');  
+const songTitleElement = document.getElementById('song-title');
+const avatar = document.getElementById('avatar');
+const avatarInput = document.getElementById('avatar-input');
+const currentTimeSpan = document.getElementById('current-time');
+const totalTimeSpan = document.getElementById('total-time');
+const musicPlayer = document.querySelector('.music-player'); // Get the player element
+const playerContainer = document.querySelector('.player-container'); // Lấy container mới
+const controlButtons = document.querySelectorAll('.control-button');
+const searchIcon = document.querySelector('.search-icon');
+const settingsIcon = document.querySelector('.settings-icon');
+const avatarWrapper = document.querySelector('.avatar-wrapper');
+const avatarPlaceholder = document.getElementById('avatar-placeholder');
 
 const setMsg = txt => {
   const m = $('messages');
@@ -57,70 +73,46 @@ async function loadLicensedCatalog() {
   }
 }
 
-
-document.addEventListener('DOMContentLoaded', async function () {
-    const audio = document.getElementById('audio');
-    const playButton = document.getElementById('play-button');
-    const seekBar = document.querySelector('.seek-bar');
-    const usernameInput = document.getElementById('username');
-    const songTitleElement = document.getElementById('song-title');
-    const avatar = document.getElementById('avatar');
-    const avatarInput = document.getElementById('avatar-input');
-    const currentTimeSpan = document.getElementById('current-time');
-    const totalTimeSpan = document.getElementById('total-time');
-    const musicPlayer = document.querySelector('.music-player'); // Get the player element
-    const playerContainer = document.querySelector('.player-container'); // Lấy container mới
-
-    // Get all elements that should change color with primary-color
-    const controlButtons = document.querySelectorAll('.control-button');
-    const searchIcon = document.querySelector('.search-icon');
-    const settingsIcon = document.querySelector('.settings-icon');
-
-    // Thêm các biến mới cho avatar placeholder
-    const avatarWrapper = document.querySelector('.avatar-wrapper');
-    const avatarPlaceholder = document.getElementById('avatar-placeholder');
-
-
-    const freeSongs = [
-        { title: "Bad Apple", artist: "Touhou", src: "music/Bad Apple.mp3" },
-        { title: "LAST NIGHT", artist: "BLACKLIONS", src: "music/LAST NIGHT.mp3" }
+const freeSongs = [
+    { title: "Bad Apple", artist: "Touhou", src: "music/Bad Apple.mp3" },
+    { title: "LAST NIGHT", artist: "BLACKLIONS", src: "music/LAST NIGHT.mp3" }
 ];
-    let currentSongIndex = 0;
-    songs = [...freeSongs];
-    if (isLicensed && token) {
-        await loadLicensedCatalog();
-    }
-function renderSuggestions(q) {
-  const query = (q || '').toLowerCase();
-  songSuggestions.innerHTML = '';
-
-  const list = songs.filter(s =>
-    s.title.toLowerCase().includes(query) ||
-    (s.artist && s.artist.toLowerCase().includes(query))
-  );
-
-  if (list.length === 0) {
-    const no = document.createElement('div');
-    no.className = 'song-item';
-    no.textContent = 'Không tìm thấy bài hát.';
-    songSuggestions.appendChild(no);
-    return;
-  }
-
-  list.forEach((s) => {
-    const i = songs.indexOf(s);
-    const div = document.createElement('div');
-    div.className = 'song-item';
-    div.textContent = `${s.title}${s.artist ? ' - ' + s.artist : ''}`;
-    div.onclick = () => { currentIndex = i; playAtIndex(i); };
-    songSuggestions.appendChild(div);
-  });
-
-  const badge = $('accessBadge');
-  if (badge) badge.textContent = `Chế độ: ${isLicensed ? 'Licensed' : 'Free'}`;
+let currentSongIndex = 0;
+songs = [...freeSongs];
+if (isLicensed && token) {
+    loadLicensedCatalog();
 }
-});
 
+function renderSongSuggestions(query) {
+    songSuggestions.innerHTML = '';
+
+    const list = songs.filter(s =>
+        s.title.toLowerCase().includes(query) ||
+        (s.artist && s.artist.toLowerCase().includes(query))
+    );
+
+    if (list.length === 0) {
+        const no = document.createElement('div');
+        no.className = 'song-item';
+        no.textContent = 'Không tìm thấy bài hát.';
+        songSuggestions.appendChild(no);
+        return;
+    }
+
+    list.forEach((s, i) => {
+        const div = document.createElement('div');
+        div.className = 'song-item';
+        div.textContent = `${s.title}${s.artist ? ' - ' + s.artist : ''}`;
+        div.onclick = () => {
+            currentSongIndex = i;
+            playCurrentSong();
+        };
+        songSuggestions.appendChild(div);
+    });
+
+    const badge = $('accessBadge');
+    if (badge) badge.textContent = `Chế độ: ${isLicensed ? 'Licensed' : 'Free'}`;
+}
     // --- Audio Playback Controls ---
     playButton.addEventListener('click', function() {
         if (audio.paused) {
