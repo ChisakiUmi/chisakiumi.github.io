@@ -46,7 +46,7 @@ function saveToken(t) {
     localStorage.removeItem("licensedAccess");
     isLicensed = false;
   }
-  const badge = $('accessBadge');
+  const badge = document.getElementById('accessBadge');
   if (badge) badge.textContent = `Chế độ: ${isLicensed ? 'Licensed' : 'Free'}`
 }
 
