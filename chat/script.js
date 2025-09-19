@@ -1,4 +1,4 @@
-var API_BASE = "https://backend-oik0.onrender.com";
+const API_BASE = "https://backend-oik0.onrender.com";
 let selectedFiles = [];
 
 const user_id = localStorage.getItem('user_id') || (function(){
