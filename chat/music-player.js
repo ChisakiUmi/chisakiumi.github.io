@@ -2,8 +2,6 @@ let token = localStorage.getItem("music_token") || null;
 let isLicensed = localStorage.getItem("licensedAccess") === "1";
 let searchTimer = null;
 let currentSongIndex = 0;
-const API_BASE = window.API_BASE || "https://backend-oik0.onrender.com";
-
 const freeSongs = [
   { title: "Bad Apple", artist: "Touhou", src: "music/Bad Apple.mp3" },
   { title: "LAST NIGHT", artist: "BLACKLIONS", src: "music/LAST NIGHT.mp3" }
