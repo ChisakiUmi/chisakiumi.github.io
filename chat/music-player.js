@@ -3,7 +3,6 @@ let isLicensed = localStorage.getItem("licensedAccess") === "1";
 let searchTimer = null;
 let currentSongIndex = 0;
 const freeSongs = [
-  { title: "09 chuyện thường", artist: "Ngọt Band", src: "https://docs.google.com/uc?export=download&id=1IQRbVehvOtR73LHCBBFeuICty1gcAabm" },
   { title: "LAST NIGHT", artist: "BLACKLIONS", src: "music/LAST NIGHT.mp3" }
 ];
 let songs = [...freeSongs];
