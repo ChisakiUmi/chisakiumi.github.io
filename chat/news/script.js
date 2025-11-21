@@ -56,7 +56,7 @@ filterButtons.forEach(button => {
 });
 
 function filterNewsByCategory(category) {
-    fetch('https://backend-oik0.onrender.com/api/news')
+    fetch('https://backend-1-m5tj.onrender.com/api/news')
         .then(res => res.json())
         .then(data => {
             const currentDate = new Date();
@@ -215,7 +215,7 @@ newsForm.addEventListener('submit', function(e) {
 
     selectedFiles.forEach(file => formData.append('images', file));
 
-    fetch('https://backend-oik0.onrender.com/api/news', {
+    fetch('https://backend-1-m5tj.onrender.com/api/news', {
         method: 'POST',
         body: formData
     })
