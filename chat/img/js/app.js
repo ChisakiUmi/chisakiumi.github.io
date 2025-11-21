@@ -40,7 +40,7 @@ function initApp() {
 
 // Tải danh sách ảnh từ server
 function loadImagesFromServer() {
-    fetch('https://backend-oik0.onrender.com/api/library/images')
+    fetch('https://backend-1-m5tj.onrender.com/api/library/images')
         .then(response => response.json())
         .then(images => {
             gallery.innerHTML = '';
@@ -161,7 +161,7 @@ async function uploadImageToServer(selectedFile, metadata) {
     formData.append("source", metadata.source);
     formData.append("message", metadata.message);
 
-    const res = await fetch("https://backend-oik0.onrender.com/api/library/upload", {
+    const res = await fetch("https://backend-1-m5tj.onrender.com/api/library/upload", {
         method: "POST",
         body: formData,
     });
@@ -174,7 +174,7 @@ async function uploadImageToServer(selectedFile, metadata) {
 // Xóa ảnh
 async function deleteImage(imageId) {
     try {
-        const response = await fetch(`https://backend-oik0.onrender.com/api/library/images/${imageId}`, {
+        const response = await fetch(`https://backend-1-m5tj.onrender.com/api/library/images/${imageId}`, {
             method: 'DELETE'
         });
         
