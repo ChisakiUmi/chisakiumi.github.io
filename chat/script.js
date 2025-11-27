@@ -497,7 +497,131 @@ async function handleReactionClick(noteId, emoji) {
     }
 }
 
+/* =================================================
+   TÍNH NĂNG CONTEXT MENU & CÁ NHÂN HÓA (ANIME.JS)
+   ================================================= */
+document.addEventListener('DOMContentLoaded', () => {
+    const contextMenu = document.getElementById('context-menu');
+    const opacitySlider = document.getElementById('opacity-slider');
+    const fontSelector = document.getElementById('font-selector');
+    
+    // 1. Load cài đặt cũ của người dùng khi vào web
+    loadUserPreferences();
 
+    // 2. Sự kiện Click Chuột Phải
+    document.addEventListener('contextmenu', (e) => {
+        e.preventDefault(); // Chặn menu mặc định của trình duyệt
+
+        // Tính toán vị trí để menu không bị tràn ra ngoài màn hình
+        let x = e.clientX;
+        let y = e.clientY;
+        const menuWidth = 250;
+        const menuHeight = 250;
+
+        if (x + menuWidth > window.innerWidth) x -= menuWidth;
+        if (y + menuHeight > window.innerHeight) y -= menuHeight;
+
+        // Set vị trí
+        contextMenu.style.left = `${x}px`;
+        contextMenu.style.top = `${y}px`;
+        contextMenu.style.display = 'block';
+
+        // Hiệu ứng Anime.js
+        anime({
+            targets: '#context-menu',
+            opacity: [0, 1],       // Từ mờ đến rõ
+            scale: [0.8, 1],       // Từ nhỏ đến bình thường
+            duration: 200,
+            easing: 'easeOutQuad'
+        });
+    });
+
+    // 3. Đóng menu khi click ra ngoài
+    document.addEventListener('click', (e) => {
+        if (!contextMenu.contains(e.target)) {
+            if (contextMenu.style.display === 'block') {
+                // Hiệu ứng đóng
+                anime({
+                    targets: '#context-menu',
+                    opacity: 0,
+                    scale: 0.9,
+                    duration: 150,
+                    easing: 'easeInQuad',
+                    complete: () => {
+                        contextMenu.style.display = 'none';
+                    }
+                });
+            }
+        }
+    });
+
+    // 4. Xử lý Logic Thay đổi
+
+    // --- Thay đổi độ trong suốt (Real-time) ---
+    opacitySlider.addEventListener('input', (e) => {
+        const val = e.target.value;
+        // Cập nhật biến CSS ngay lập tức
+        document.documentElement.style.setProperty('--user-opacity', val);
+        // Lưu vào bộ nhớ
+        localStorage.setItem('pref_opacity', val);
+    });
+
+    // --- Thay đổi Font chữ ---
+    fontSelector.addEventListener('change', (e) => {
+        const val = e.target.value;
+        document.documentElement.style.setProperty('--user-font', val);
+        localStorage.setItem('pref_font', val);
+    });
+
+    // --- Nút mở panel Background (Liên kết với code cũ) ---
+    const btnOpenBg = document.getElementById('ctx-open-bg');
+    btnOpenBg.addEventListener('click', () => {
+        // Tìm nút settings trong music player và click nó
+        const existingSettingsBtn = document.getElementById('settings-toggle');
+        if (existingSettingsBtn) {
+            existingSettingsBtn.click();
+        } else {
+            // Fallback nếu không tìm thấy nút, tự hiển thị panel
+            const panel = document.getElementById('settings-panel');
+            if(panel) panel.classList.add('show');
+        }
+        contextMenu.style.display = 'none';
+    });
+
+    // --- Reset về mặc định ---
+    document.getElementById('ctx-reset').addEventListener('click', () => {
+        // Reset biến CSS
+        document.documentElement.style.setProperty('--user-opacity', '0.8');
+        document.documentElement.style.setProperty('--user-font', 'monospace, sans-serif');
+        
+        // Reset Inputs
+        opacitySlider.value = 0.8;
+        fontSelector.value = 'monospace, sans-serif';
+        
+        // Xóa bộ nhớ
+        localStorage.removeItem('pref_opacity');
+        localStorage.removeItem('pref_font');
+        
+        alert("Đã khôi phục giao diện mặc định!");
+        contextMenu.style.display = 'none';
+    });
+
+    // Hàm load cài đặt
+    function loadUserPreferences() {
+        const savedOpacity = localStorage.getItem('pref_opacity');
+        const savedFont = localStorage.getItem('pref_font');
+
+        if (savedOpacity) {
+            document.documentElement.style.setProperty('--user-opacity', savedOpacity);
+            opacitySlider.value = savedOpacity;
+        }
+
+        if (savedFont) {
+            document.documentElement.style.setProperty('--user-font', savedFont);
+            fontSelector.value = savedFont;
+        }
+    }
+});
 
 document.addEventListener('click', (e) => {
     const reactionPickers = document.querySelectorAll('.reaction-picker');
