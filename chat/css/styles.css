@@ -3,7 +3,7 @@
     box-sizing: border-box;
 }
 body {
-    font-family: monospace, sans-serif;
+    font-family: var(--user-font) !important;
     margin: 0;
     padding: 0;
     height: 100vh;
@@ -886,6 +886,72 @@ p {
 .song-suggestions::-webkit-scrollbar-thumb:hover, .settings-panel::-webkit-scrollbar-thumb:hover {
     background: #5a6cb8;
 }
+.custom-context-menu {
+    position: fixed;
+    z-index: 9999;
+    width: 250px;
+    background: rgba(20, 20, 30, 0.95);
+    border: 1px solid #39FF14; /* Viền xanh neon theo style của bạn */
+    border-radius: 8px;
+    padding: 10px 0;
+    box-shadow: 0 0 15px rgba(57, 255, 20, 0.2);
+    display: none; /* Ẩn mặc định */
+    color: #fff;
+    transform-origin: top left;
+}
+
+.ctx-header {
+    padding: 5px 15px;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #39FF14;
+    font-weight: bold;
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 5px;
+}
+
+.ctx-item {
+    padding: 8px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    transition: background 0.2s;
+    color: #ddd;
+}
+
+.ctx-item.clickable:hover {
+    background: rgba(57, 255, 20, 0.15);
+    cursor: pointer;
+    color: #fff;
+}
+
+.ctx-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    margin: 5px 0;
+}
+
+/* Style cho inputs trong menu */
+#opacity-slider {
+    width: 90px;
+    height: 4px;
+    accent-color: #39FF14;
+}
+
+#font-selector {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid #555;
+    color: #39FF14;
+    border-radius: 4px;
+    font-size: 11px;
+    max-width: 110px;
+}
+
+.text-danger { color: #ff6b6b; }
+.text-danger:hover { background: rgba(255, 107, 107, 0.15) !important; }
+
 /* Responsive cho tablet và mobile */
 @media (max-width: 768px) {
     body {
