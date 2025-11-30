@@ -886,25 +886,59 @@ p {
 .song-suggestions::-webkit-scrollbar-thumb:hover, .settings-panel::-webkit-scrollbar-thumb:hover {
     background: #5a6cb8;
 }
-.custom-context-menu {
+/* --- 1. THÊM BIẾN VÀO :ROOT (QUAN TRỌNG) --- */
+:root {
+    /* Biến mặc định ban đầu */
+    --bg-opacity: 0.9; 
+    --main-font: 'Segoe UI', sans-serif;
+    
+    /* Các màu cũ của bạn */
+    --primary-color: #7289da;
+    --secondary-color: #ff73fa;
+    --success-color: #57F287;
+    --text-color: #ffffff;
+}
+
+/* --- 2. ÁP DỤNG BIẾN CHO TOÀN TRANG --- */
+body {
+    font-family: var(--main-font) !important; /* Font chữ sẽ đổi theo biến này */
+}
+
+/* Các thành phần nền mờ sẽ dùng biến --bg-opacity */
+.sidebar, 
+.music-player, 
+.container, 
+.input-area,
+.search-box, 
+.settings-panel {
+    /* Thay vì rgba(0,0,0, 0.8) cứng, ta dùng biến */
+    background-color: rgba(0, 0, 0, var(--bg-opacity)) !important;
+    backdrop-filter: blur(10px); /* Kính mờ */
+    transition: background-color 0.3s ease, font-family 0.3s ease;
+}
+
+/* --- 3. GIAO DIỆN CONTEXT MENU (Menu Chuột Phải) --- */
+#custom-context-menu {
     position: fixed;
-    z-index: 9999;
-    width: 250px;
-    background: rgba(20, 20, 30, 0.95);
-    border: 1px solid #39FF14; /* Viền xanh neon theo style của bạn */
-    border-radius: 8px;
-    padding: 10px 0;
-    box-shadow: 0 0 15px rgba(57, 255, 20, 0.2);
-    display: none; /* Ẩn mặc định */
+    z-index: 10000; /* Đè lên mọi thứ */
+    width: 260px;
+    background: rgba(30, 30, 35, 0.95); /* Màu nền tối */
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 8px 0;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
     color: #fff;
-    transform-origin: top left;
+    
+    /* Ẩn mặc định, JS sẽ hiển thị nó */
+    display: none; 
+    transform-origin: top left; /* Để Anime.js phóng to từ góc */
 }
 
 .ctx-header {
-    padding: 5px 15px;
+    padding: 8px 15px;
     font-size: 11px;
     text-transform: uppercase;
-    color: #39FF14;
+    color: #bbb;
     font-weight: bold;
     letter-spacing: 1px;
     border-bottom: 1px solid rgba(255,255,255,0.1);
@@ -912,19 +946,20 @@ p {
 }
 
 .ctx-item {
-    padding: 8px 15px;
+    padding: 10px 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 13px;
+    font-size: 14px;
     transition: background 0.2s;
-    color: #ddd;
+    cursor: default;
 }
 
+/* Chỉ những mục có class clickable mới có hiệu ứng hover mạnh */
 .ctx-item.clickable:hover {
-    background: rgba(57, 255, 20, 0.15);
+    background: var(--primary-color);
+    color: white;
     cursor: pointer;
-    color: #fff;
 }
 
 .ctx-divider {
@@ -933,24 +968,25 @@ p {
     margin: 5px 0;
 }
 
-/* Style cho inputs trong menu */
+/* Style cho thanh kéo và menu chọn */
 #opacity-slider {
-    width: 90px;
-    height: 4px;
-    accent-color: #39FF14;
+    width: 100px;
+    accent-color: var(--primary-color);
+    cursor: pointer;
 }
 
-#font-selector {
-    background: rgba(0,0,0,0.5);
+#font-select {
+    background: rgba(0,0,0,0.4);
     border: 1px solid #555;
-    color: #39FF14;
+    color: #fff;
     border-radius: 4px;
-    font-size: 11px;
+    font-size: 12px;
+    padding: 2px;
     max-width: 110px;
 }
 
-.text-danger { color: #ff6b6b; }
-.text-danger:hover { background: rgba(255, 107, 107, 0.15) !important; }
+.text-red { color: #ff6b6b; }
+.text-red:hover { background: rgba(255, 107, 107, 0.2) !important; color: #ff6b6b; }
 
 /* Responsive cho tablet và mobile */
 @media (max-width: 768px) {
