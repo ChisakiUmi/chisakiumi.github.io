@@ -183,8 +183,8 @@ p {
     position: fixed;
     border: 4px solid #5dbe4c;
     bottom: 0;
-    left: 60px;
-    rigth: 0;
+    left: 0px;
+    width: 100%;
     background-color: rgba(0, 0, 0, 0.7);
     padding: 10px;
     height: auto;
@@ -886,6 +886,7 @@ p {
 .song-suggestions::-webkit-scrollbar-thumb:hover, .settings-panel::-webkit-scrollbar-thumb:hover {
     background: #5a6cb8;
 }
+
 /* --- 1. THÊM BIẾN VÀO :ROOT (QUAN TRỌNG) --- */
 :root {
     /* Biến mặc định ban đầu */
@@ -897,23 +898,6 @@ p {
     --secondary-color: #ff73fa;
     --success-color: #57F287;
     --text-color: #ffffff;
-}
-
-/* --- 2. ÁP DỤNG BIẾN CHO TOÀN TRANG --- */
-body {
-    font-family: var(--main-font) !important; /* Font chữ sẽ đổi theo biến này */
-}
-
-/* Các thành phần nền mờ sẽ dùng biến --bg-opacity */
-.sidebar, 
-.music-player, 
-.container, 
-.search-box, 
-.settings-panel {
-    /* Thay vì rgba(0,0,0, 0.8) cứng, ta dùng biến */
-    background-color: rgba(0, 0, 0, var(--bg-opacity)) !important;
-    backdrop-filter: blur(10px); /* Kính mờ */
-    transition: background-color 0.3s ease, font-family 0.3s ease;
 }
 
 /* --- 3. GIAO DIỆN CONTEXT MENU (Menu Chuột Phải) --- */
