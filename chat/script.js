@@ -497,132 +497,133 @@ async function handleReactionClick(noteId, emoji) {
     }
 }
 
-/* =================================================
-   TÍNH NĂNG CONTEXT MENU & CÁ NHÂN HÓA (ANIME.JS)
-   ================================================= */
-document.addEventListener('DOMContentLoaded', () => {
-    const contextMenu = document.getElementById('context-menu');
-    const opacitySlider = document.getElementById('opacity-slider');
-    const fontSelector = document.getElementById('font-selector');
-    
-    // 1. Load cài đặt cũ của người dùng khi vào web
-    loadUserPreferences();
+/* =========================================
+   LOGIC MENU CHUỘT PHẢI & TÙY CHỈNH (ANIME.JS)
+   ========================================= */
 
-    // 2. Sự kiện Click Chuột Phải
+document.addEventListener('DOMContentLoaded', () => {
+    // Lấy các phần tử từ HTML theo ID bạn đã đặt
+    const ctxMenu = document.getElementById('custom-context-menu');
+    const opacitySlider = document.getElementById('opacity-slider');
+    const fontSelect = document.getElementById('font-select');
+    const btnOpenSettings = document.getElementById('ctx-open-settings');
+    const btnReset = document.getElementById('ctx-reset');
+
+    // 1. Tải cài đặt cũ từ LocalStorage (nếu có)
+    loadPreferences();
+
+    // 2. SỰ KIỆN CLICK CHUỘT PHẢI (Context Menu)
     document.addEventListener('contextmenu', (e) => {
         e.preventDefault(); // Chặn menu mặc định của trình duyệt
 
         // Tính toán vị trí để menu không bị tràn ra ngoài màn hình
         let x = e.clientX;
         let y = e.clientY;
-        const menuWidth = 250;
-        const menuHeight = 250;
+        const menuWidth = 260;
+        const menuHeight = 320; // Ước lượng chiều cao
 
+        // Nếu sát lề phải quá thì đẩy sang trái
         if (x + menuWidth > window.innerWidth) x -= menuWidth;
+        // Nếu sát lề dưới quá thì đẩy lên trên
         if (y + menuHeight > window.innerHeight) y -= menuHeight;
 
-        // Set vị trí
-        contextMenu.style.left = `${x}px`;
-        contextMenu.style.top = `${y}px`;
-        contextMenu.style.display = 'block';
+        // Đặt vị trí
+        ctxMenu.style.left = `${x}px`;
+        ctxMenu.style.top = `${y}px`;
+        ctxMenu.style.display = 'block';
 
-        // Hiệu ứng Anime.js
+        // HIỆU ỨNG HIỆN MENU (Dùng Anime.js)
         anime({
-            targets: '#context-menu',
-            opacity: [0, 1],       // Từ mờ đến rõ
-            scale: [0.8, 1],       // Từ nhỏ đến bình thường
-            duration: 200,
-            easing: 'easeOutQuad'
+            targets: '#custom-context-menu',
+            opacity: [0, 1],       // Từ trong suốt thành rõ
+            scale: [0.8, 1],       // Từ nhỏ phóng to
+            duration: 250,
+            easing: 'easeOutElastic(1, .8)' // Hiệu ứng nảy nhẹ
         });
     });
 
-    // 3. Đóng menu khi click ra ngoài
+    // 3. ĐÓNG MENU KHI CLICK RA NGOÀI
     document.addEventListener('click', (e) => {
-        if (!contextMenu.contains(e.target)) {
-            if (contextMenu.style.display === 'block') {
-                // Hiệu ứng đóng
-                anime({
-                    targets: '#context-menu',
-                    opacity: 0,
-                    scale: 0.9,
-                    duration: 150,
-                    easing: 'easeInQuad',
-                    complete: () => {
-                        contextMenu.style.display = 'none';
-                    }
-                });
-            }
+        // Nếu click không trúng menu
+        if (ctxMenu.style.display === 'block' && !ctxMenu.contains(e.target)) {
+            // Hiệu ứng đóng
+            anime({
+                targets: '#custom-context-menu',
+                opacity: 0,
+                scale: 0.9,
+                duration: 150,
+                easing: 'easeInQuad',
+                complete: () => {
+                    ctxMenu.style.display = 'none'; // Ẩn hẳn sau khi animation xong
+                }
+            });
         }
     });
 
-    // 4. Xử lý Logic Thay đổi
-
-    // --- Thay đổi độ trong suốt (Real-time) ---
+    // 4. CHỨC NĂNG: CHỈNH ĐỘ MỜ (OPACITY)
     opacitySlider.addEventListener('input', (e) => {
         const val = e.target.value;
-        // Cập nhật biến CSS ngay lập tức
-        document.documentElement.style.setProperty('--user-opacity', val);
-        // Lưu vào bộ nhớ
-        localStorage.setItem('pref_opacity', val);
+        // Cập nhật biến CSS --bg-opacity
+        document.documentElement.style.setProperty('--bg-opacity', val);
+        localStorage.setItem('user_opacity', val); // Lưu lại
     });
 
-    // --- Thay đổi Font chữ ---
-    fontSelector.addEventListener('change', (e) => {
+    // 5. CHỨC NĂNG: CHỈNH FONT CHỮ
+    fontSelect.addEventListener('change', (e) => {
         const val = e.target.value;
-        document.documentElement.style.setProperty('--user-font', val);
-        localStorage.setItem('pref_font', val);
+        // Cập nhật biến CSS --main-font
+        document.documentElement.style.setProperty('--main-font', val);
+        localStorage.setItem('user_font', val); // Lưu lại
     });
 
-    // --- Nút mở panel Background (Liên kết với code cũ) ---
-    const btnOpenBg = document.getElementById('ctx-open-bg');
-    btnOpenBg.addEventListener('click', () => {
-        // Tìm nút settings trong music player và click nó
-        const existingSettingsBtn = document.getElementById('settings-toggle');
-        if (existingSettingsBtn) {
-            existingSettingsBtn.click();
+    // 6. CHỨC NĂNG: MỞ PANEL CÀI ĐẶT (Background/Màu)
+    btnOpenSettings.addEventListener('click', () => {
+        // Tìm nút settings gốc trên giao diện và kích hoạt nó
+        const existingSettingsToggle = document.getElementById('settings-toggle');
+        if (existingSettingsToggle) {
+            existingSettingsToggle.click();
         } else {
-            // Fallback nếu không tìm thấy nút, tự hiển thị panel
+            // Dự phòng nếu không tìm thấy nút
             const panel = document.getElementById('settings-panel');
             if(panel) panel.classList.add('show');
         }
-        contextMenu.style.display = 'none';
+        ctxMenu.style.display = 'none'; // Đóng menu chuột phải
     });
 
-    // --- Reset về mặc định ---
-    document.getElementById('ctx-reset').addEventListener('click', () => {
+    // 7. CHỨC NĂNG: RESET VỀ MẶC ĐỊNH
+    btnReset.addEventListener('click', () => {
         // Reset biến CSS
-        document.documentElement.style.setProperty('--user-opacity', '0.8');
-        document.documentElement.style.setProperty('--user-font', 'monospace, sans-serif');
+        document.documentElement.style.setProperty('--bg-opacity', '0.9');
+        document.documentElement.style.setProperty('--main-font', "'Segoe UI', sans-serif");
         
-        // Reset Inputs
-        opacitySlider.value = 0.8;
-        fontSelector.value = 'monospace, sans-serif';
+        // Reset Input trên menu
+        opacitySlider.value = 0.9;
+        fontSelect.value = "'Segoe UI', sans-serif";
         
         // Xóa bộ nhớ
-        localStorage.removeItem('pref_opacity');
-        localStorage.removeItem('pref_font');
+        localStorage.removeItem('user_opacity');
+        localStorage.removeItem('user_font');
         
-        alert("Đã khôi phục giao diện mặc định!");
-        contextMenu.style.display = 'none';
+        alert("Đã khôi phục cài đặt gốc!");
+        ctxMenu.style.display = 'none';
     });
 
-    // Hàm load cài đặt
-    function loadUserPreferences() {
-        const savedOpacity = localStorage.getItem('pref_opacity');
-        const savedFont = localStorage.getItem('pref_font');
+    // HÀM: LOAD CÀI ĐẶT KHI VÀO TRANG
+    function loadPreferences() {
+        const savedOpacity = localStorage.getItem('user_opacity');
+        const savedFont = localStorage.getItem('user_font');
 
         if (savedOpacity) {
-            document.documentElement.style.setProperty('--user-opacity', savedOpacity);
+            document.documentElement.style.setProperty('--bg-opacity', savedOpacity);
             opacitySlider.value = savedOpacity;
         }
 
         if (savedFont) {
-            document.documentElement.style.setProperty('--user-font', savedFont);
-            fontSelector.value = savedFont;
+            document.documentElement.style.setProperty('--main-font', savedFont);
+            fontSelect.value = savedFont;
         }
     }
 });
-
 document.addEventListener('click', (e) => {
     const reactionPickers = document.querySelectorAll('.reaction-picker');
     reactionPickers.forEach(picker => {
