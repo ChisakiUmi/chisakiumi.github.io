@@ -27,7 +27,7 @@ body {
     height: calc(100vh - 117px); 
 }
 .sidebar img {
-    max-width: 110px; 
+    max-width: 130px; 
     height: auto; 
 }
 .sidebar a {
