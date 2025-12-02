@@ -3,8 +3,6 @@ let isLicensed = localStorage.getItem("licensedAccess") === "1";
 let searchTimer = null;
 let currentSongIndex = 0;
 const freeSongs = [
-    { title: "Bạch Nguyệt Quang", artist: "Táo", id: "music/Bạch Nguyệt Quang.mp3" },
-  { title: "Tình Cờ Yêu Em", artist: "Kuun Đức Nam", id: "music/TÌNH CƠ YÊU EM.mp3" },
   { title: "Bạch Nguyệt Quang", artist: "Táo", src: "music/Bạch Nguyệt Quang.mp3" },
   { title: "09 Chuyện Thường", artist: "Ngọt Band", src: "music/09 Chuyện Thường.mp3" },
   { title: "Tình Cờ Yêu Em", artist: "Kuun Đức Nam", src: "music/TÌNH CỜ YÊU EM.mp3" },
