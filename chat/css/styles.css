@@ -24,10 +24,10 @@ body {
     font-size: 20px;
     border-bottom: 2px solid #39FF14;
     border-right: 5px solid rgb(73, 206, 73);
-    height: calc(100vh - 117px); /* Có thể cần điều chỉnh nếu có thanh cuộn */
+    height: calc(100vh - 117px); 
 }
 .sidebar img {
-    max-width: 100%; 
+    max-width: 150px; 
     height: auto; 
 }
 .sidebar a {
