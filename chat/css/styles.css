@@ -26,8 +26,9 @@ body {
     border-right: 5px solid rgb(73, 206, 73);
     height: calc(100vh - 117px); /* Có thể cần điều chỉnh nếu có thanh cuộn */
 }
-.sidebar h3 {
-    margin: 0 0 20px 0;
+.sidebar img {
+    max-width: 100%; 
+    height: auto; 
 }
 .sidebar a {
     color: rgb(74, 177, 70);
