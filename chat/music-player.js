@@ -3,7 +3,41 @@ let isLicensed = localStorage.getItem("licensedAccess") === "1";
 let searchTimer = null;
 let currentSongIndex = 0;
 const freeSongs = [
-  { title: "LAST NIGHT", artist: "BLACKLIONS", src: "music/LAST NIGHT.mp3" }
+    { title: "Bạch Nguyệt Quang", artist: "Táo", id: "music/Bạch Nguyệt Quang.mp3" },
+  { title: "Tình Cờ Yêu Em", artist: "Kuun Đức Nam", id: "music/TÌNH CƠ YÊU EM.mp3" },
+  { title: "Bạch Nguyệt Quang", artist: "Táo", src: "music/Bạch Nguyệt Quang.mp3" },
+  { title: "09 Chuyện Thường", artist: "Ngọt Band", src: "music/09 Chuyện Thường.mp3" },
+  { title: "Tình Cờ Yêu Em", artist: "Kuun Đức Nam", src: "music/TÌNH CỜ YÊU EM.mp3" },
+  { title: "Tương Tư", artist: "CLOW X FLEPY", src: "music/TƯƠNG TƯ.mp3" },
+  { title: "Tháng Tư Là Lời...", artist: "Hà Anh Tuấn", src: "music/Tháng Tư Là Lời Nói Dối Của Em.mp3" },
+  { title: "Feel At Home", artist: "Bray", src: "music/Feel At Home.mp3"},
+  { title: "Bình Yên", artist: "VŨ ft Binz", src: "music/Bình Yên.mp3"},
+  { title: "Thanh Xuân", artist: "Da LAB", src: "music/Thanh Xuân.mp3"},
+  { title: "ĐỢI", artist: "52Hz", src: "music/ĐỢI.mp3"},
+  { title: "Ngày ấy", artist: "Em Ellata", src: "music/Ngày ấy.mp3"},
+  { title: "Bể Cá", artist: "Lope Dope", src: "music/BỂ CÁ.mp3"},
+  { title: "Váy Hoa Nhí", artist: "Minh Châu", src: "music/Váy Hoa Nhí.mp3"},
+  { title: "Nghe kể năm 90s", artist: "Ân ngờ ft.Suzie MK", src: "music/Nghe kể năm 90s.mp3"},
+  { title: "CHUYỂN KÊNH", artist: "Ngọt", src: "music/CHUYỂN KÊNH.mp3"},
+  { title: "Em dạo này", artist: "Ngọt", src: "music/Em dạo này.mp3"},
+  { title: "Thấy Chưa", artist: "Ngọt", src: "music/Thấy Chưa.mp3"},
+  { title: "BÔNG HOA CHẲNG...", artist: "NHƯ VIỆT", src: "music/BÔNG HOA CHẲNG THUỘC VỀ TA .mp3"},
+  { title: "Trở về lối đi xưa", artist: "Notor", src: "music/Old Town Road tiếng việt.mp3"},
+  { title: "Phép Màu", artist: "Minh Tốc", src: "music/Phép Màu.mp3"},
+  { title: "Ojos Tristes", artist: "Selena Gomez", src: "music/Ojos Tristes.mp3"},
+  { title: "Stay With Me", artist: "Miki Matsubara", src: "music/Stay With Me.mp3"},
+  { title: "Blue Tequile", artist: "Táo", src: "music/Blue Tequile.mp3"},
+  { title: "Cry for Me", artist: "Michita ft 愛海", src: "music/Cry for me.mp3"},
+  { title: "Truy tìm giắc mơ đó", artist: "YOASOBI", src: "music/あの夢をなぞって .mp3"},
+  { title: "Tabun", artist: "YOASOBI", src: "music/たふん.mp3"},
+  { title: "Lemon", artist: "Kenshi Yonezu", src: "music/Lemon.mp3"},
+  { title: "Rokudenashi", artist: "ロクデナシ「愛が灯る」", src: "music/Rokudenashi.mp3"},
+  { title: "Sukidakara", artist: "『ユイカ』", src: "music/Sukidakara.mp3"},
+  { title: "Harehare Ya", artist: "Sou", src: "music/Harehare Ya.mp3"},
+  { title: "Uchiagehanabi", artist: "", src: "music/Uchiagehanabi.mp3"},
+  { title: "Bad Apple", artist: "Touhou", src: "music/Bad Apple.mp3"},
+  { title: "Tình đắng như ly...", artist: "nân. x Ngơ", src: "music/tình đắng như ly cà phê.mp3"},
+  { title: "LAST NIGHT", artist: "BLACKLIONS", src: "music/LAST NIGHT.mp3"},
 ];
 let songs = [...freeSongs];
 

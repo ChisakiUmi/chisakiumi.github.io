@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chisaki Umi</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" href="favicon/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="css/styles.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 </head>
+
 <body>
     <div class="sidebar">
         <h3>Menu</h3>
@@ -77,10 +80,12 @@
             </div>
             <div class="icons">
                 <div class="search-container">
-                    <button class="search-icon" title="Tìm kiếm" id="search-toggle"><i class="fas fa-search"></i></button>
+                    <button class="search-icon" title="Tìm kiếm" id="search-toggle"><i
+                            class="fas fa-search"></i></button>
                 </div>
                 <div class="settings-container">
-                    <button class="settings-icon" title="Tùy chỉnh" id="settings-toggle"><i class="fas fa-ellipsis-v"></i></button>
+                    <button class="settings-icon" title="Tùy chỉnh" id="settings-toggle"><i
+                            class="fas fa-ellipsis-v"></i></button>
                 </div>
             </div>
         </div>
@@ -95,17 +100,20 @@
             <div class="settings-section">
                 <span class="settings-title">Màu sắc chủ đạo</span>
                 <div class="color-picker">
-                    <div class="color-option selected" style="background: var(--primary-color);" data-color="--primary-color"></div>
-                    <div class="color-option" style="background: var(--secondary-color);" data-color="--secondary-color"></div>
+                    <div class="color-option selected" style="background: var(--primary-color);"
+                        data-color="--primary-color"></div>
+                    <div class="color-option" style="background: var(--secondary-color);"
+                        data-color="--secondary-color"></div>
                     <div class="color-option" style="background: #ff66c4;" data-color="#ff66c4"></div>
-                    <div class="color-option" style="background: var(--success-color);" data-color="--success-color"></div>
+                    <div class="color-option" style="background: var(--success-color);" data-color="--success-color">
+                    </div>
                     <div class="color-option custom-color" title="Tùy chỉnh màu">
                         <span>+</span>
                         <input type="color" id="custom-color-picker" value="#7289da">
                     </div>
                 </div>
             </div>
-            
+
             <div class="settings-section">
                 <span class="settings-title">Giao diện nền</span>
                 <div class="bg-selector">
@@ -114,34 +122,66 @@
 
                     <span class="bg-category-title">Phong cảnh Nhật Bản</span>
                     <div class="bg-options">
-                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/736x/a5/1d/46/a51d465948b6f5b9112b414fc93a47d6.jpg')" data-bg="japan_landscape1"></div>
-                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/736x/86/44/e4/8644e450cfc4b866d1bf68218e6bb958.jpg')" data-bg="japan_landscape2"></div>
-                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/736x/6d/40/dc/6d40dc07a417ac1d5af185eeb6254669.jpg')" data-bg="japan_landscape3"></div>
-                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/736x/11/b9/15/11b915e4d0a0808ee4aec978ae759252.jpg')" data-bg="japan_landscape3"></div>
+                        <div class="bg-option"
+                            style="background-image: url('https://i.pinimg.com/736x/a5/1d/46/a51d465948b6f5b9112b414fc93a47d6.jpg')"
+                            data-bg="japan_landscape1"></div>
+                        <div class="bg-option"
+                            style="background-image: url('https://i.pinimg.com/736x/86/44/e4/8644e450cfc4b866d1bf68218e6bb958.jpg')"
+                            data-bg="japan_landscape2"></div>
+                        <div class="bg-option"
+                            style="background-image: url('https://i.pinimg.com/736x/6d/40/dc/6d40dc07a417ac1d5af185eeb6254669.jpg')"
+                            data-bg="japan_landscape3"></div>
+                        <div class="bg-option"
+                            style="background-image: url('https://i.pinimg.com/736x/11/b9/15/11b915e4d0a0808ee4aec978ae759252.jpg')"
+                            data-bg="japan_landscape3"></div>
                     </div>
 
                     <span class="bg-category-title">Anime</span>
                     <div class="bg-options">
-                        <div class="bg-option" style="background-image: url('https://wallpaper.forfun.com/fetch/32/32344a97a4a120249bb0a8363879eb96.jpeg')" data-bg="anime_scenery1"></div>
-                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/736x/da/b3/59/dab359b4a8f0eab45d9cda9cdd8c70e2.jpg')" data-bg="anime_scenery2"></div>
-                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/736x/5a/90/49/5a904973a5917dea05d4d1fc3c60cace.jpg')" data-bg="anime_scenery3"></div>
-                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/736x/a4/b5/24/a4b52405c5870a9fb64ac5dbf36aa43e.jpg')" data-bg="anime_scenery4"></div>
+                        <div class="bg-option"
+                            style="background-image: url('https://wallpaper.forfun.com/fetch/32/32344a97a4a120249bb0a8363879eb96.jpeg')"
+                            data-bg="anime_scenery1"></div>
+                        <div class="bg-option"
+                            style="background-image: url('https://i.pinimg.com/736x/da/b3/59/dab359b4a8f0eab45d9cda9cdd8c70e2.jpg')"
+                            data-bg="anime_scenery2"></div>
+                        <div class="bg-option"
+                            style="background-image: url('https://i.pinimg.com/736x/5a/90/49/5a904973a5917dea05d4d1fc3c60cace.jpg')"
+                            data-bg="anime_scenery3"></div>
+                        <div class="bg-option"
+                            style="background-image: url('https://i.pinimg.com/736x/a4/b5/24/a4b52405c5870a9fb64ac5dbf36aa43e.jpg')"
+                            data-bg="anime_scenery4"></div>
                     </div>
 
                     <span class="bg-category-title">Pixel Art / Chill</span>
                     <div class="bg-options">
-                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/736x/d4/54/8e/d4548e01fce2f0ccb100c0778e299e75.jpg')" data-bg="pixel_chill1"></div>
-                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/736x/32/b4/3d/32b43d6c5614f604aaf949d4b92bcbb6.jpg')" data-bg="pixel_chill2"></div>
-                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/736x/90/95/be/9095beaa8e13b57de773ba17d41c6bf8.jpg')" data-bg="pixel_chill3"></div>
-                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/736x/cd/57/f4/cd57f4a907cd4e2660a6b4069f5f4d74.jpg')" data-bg="pixel_chill4"></div>
+                        <div class="bg-option"
+                            style="background-image: url('https://i.pinimg.com/736x/d4/54/8e/d4548e01fce2f0ccb100c0778e299e75.jpg')"
+                            data-bg="pixel_chill1"></div>
+                        <div class="bg-option"
+                            style="background-image: url('https://i.pinimg.com/736x/32/b4/3d/32b43d6c5614f604aaf949d4b92bcbb6.jpg')"
+                            data-bg="pixel_chill2"></div>
+                        <div class="bg-option"
+                            style="background-image: url('https://i.pinimg.com/736x/90/95/be/9095beaa8e13b57de773ba17d41c6bf8.jpg')"
+                            data-bg="pixel_chill3"></div>
+                        <div class="bg-option"
+                            style="background-image: url('https://i.pinimg.com/736x/cd/57/f4/cd57f4a907cd4e2660a6b4069f5f4d74.jpg')"
+                            data-bg="pixel_chill4"></div>
                     </div>
 
                     <span class="bg-category-title">Gif</span>
                     <div class="bg-options">
-                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/originals/56/dd/6a/56dd6a65e6788be82eea3e4ed77af474.gif')" data-bg="gif1"></div>
-                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/originals/50/e9/cf/50e9cfadf6d67a38c21ee84b9bb73ea6.gif')" data-bg="gif2"></div>
-                        <div class="bg-option" style="background-image: url('https://i.pinimg.com/originals/45/0c/ac/450cac79c0828ca950c1325830515d23.gif')" data-bg="gif3"></div>
-                        <div class="bg-option" style="background-image: url('https://giffiles.alphacoders.com/130/13036.gif')" data-bg="gif4"></div>
+                        <div class="bg-option"
+                            style="background-image: url('https://i.pinimg.com/originals/56/dd/6a/56dd6a65e6788be82eea3e4ed77af474.gif')"
+                            data-bg="gif1"></div>
+                        <div class="bg-option"
+                            style="background-image: url('https://i.pinimg.com/originals/50/e9/cf/50e9cfadf6d67a38c21ee84b9bb73ea6.gif')"
+                            data-bg="gif2"></div>
+                        <div class="bg-option"
+                            style="background-image: url('https://i.pinimg.com/originals/45/0c/ac/450cac79c0828ca950c1325830515d23.gif')"
+                            data-bg="gif3"></div>
+                        <div class="bg-option"
+                            style="background-image: url('https://giffiles.alphacoders.com/130/13036.gif')"
+                            data-bg="gif4"></div>
                     </div>
 
                 </div>
@@ -150,34 +190,34 @@
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
-<div id="custom-context-menu" style="display: none;">
-    <div class="ctx-header">Cài đặt giao diện</div>
-    
-    <div class="ctx-item">
-        <span><i class="fas fa-ghost"></i> Độ mờ nền</span>
-        <input type="range" id="opacity-slider" min="0.2" max="1" step="0.05" value="0.9">
-    </div>
+    <div id="custom-context-menu" style="display: none;">
+        <div class="ctx-header">Cài đặt giao diện</div>
 
-    <div class="ctx-item">
-        <span><i class="fas fa-font"></i> Font chữ</span>
-        <select id="font-select">
-            <option value="'Segoe UI', sans-serif">Mặc định</option>
-            <option value="'Courier New', monospace">Courier (Code)</option>
-            <option value="'Times New Roman', serif">Times New Roman</option>
-            <option value="'Comic Sans MS', cursive">Vui nhộn</option>
-        </select>
-    </div>
+        <div class="ctx-item">
+            <span><i class="fas fa-ghost"></i> Độ mờ nền</span>
+            <input type="range" id="opacity-slider" min="0.2" max="1" step="0.05" value="0.9">
+        </div>
 
-    <div class="ctx-divider"></div>
+        <div class="ctx-item">
+            <span><i class="fas fa-font"></i> Font chữ</span>
+            <select id="font-select">
+                <option value="'Segoe UI', sans-serif">Mặc định</option>
+                <option value="'Courier New', monospace">Courier (Code)</option>
+                <option value="'Times New Roman', serif">Times New Roman</option>
+                <option value="'Comic Sans MS', cursive">Vui nhộn</option>
+            </select>
+        </div>
 
-    <div class="ctx-item clickable" id="ctx-open-settings">
-        <i class="fas fa-palette"></i> Đổi hình nền / Màu
-    </div>
+        <div class="ctx-divider"></div>
 
-    <div class="ctx-item clickable text-red" id="ctx-reset">
-        <i class="fas fa-undo"></i> Khôi phục mặc định
+        <div class="ctx-item clickable" id="ctx-open-settings">
+            <i class="fas fa-palette"></i> Đổi hình nền / Màu
+        </div>
+
+        <div class="ctx-item clickable text-red" id="ctx-reset">
+            <i class="fas fa-undo"></i> Khôi phục mặc định
+        </div>
     </div>
-</div>
 
     <!-- Audio element - src will be set by JavaScript -->
     <audio id="audio" src="" preload="auto"></audio>
@@ -187,4 +227,5 @@
     <!-- Script của trình phát nhạc (đã tách riêng) -->
     <script src="music-player.js"></script>
 </body>
+
 </html>
