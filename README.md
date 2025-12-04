@@ -21,9 +21,9 @@ Là một dự án được thực hiện bởi Nguyễn Minh Ngọc, sau khi c�
   - 💻[Node.js](https://nodejs.org/fr) + 📦npm packages.
 - ☁️**Media Storage**  
   - [Cloudinary](https://cloudinary.com/).
-> ⚠️ Backend không nằm trong repo này, chỉ deploy trên **Render**.
 - 🗂**SQL**
   - [Supabase](https://supabase.com/).
+> ⚠️ Backend không nằm trong repo này, chỉ deploy trên **Render**.
 
 ## 🌍 Triển khai
 
