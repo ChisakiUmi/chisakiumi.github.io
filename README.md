@@ -21,13 +21,16 @@ Là một dự án được thực hiện bởi Nguyễn Minh Ngọc, sau khi c�
   - 💻[Node.js](https://nodejs.org/fr) + 📦npm packages.
 - ☁️**Media Storage**  
   - [Cloudinary](https://cloudinary.com/).
-> ⚠️ Backend không nằm trong repo này, chỉ deploy trên **Render**. 
+> ⚠️ Backend không nằm trong repo này, chỉ deploy trên **Render**.
+- 🗂**SQL**
+  - [Supabase](https://supabase.com/).
 
 ## 🌍 Triển khai
 
 - 🌐 Frontend → GitHub Pages (public)
 - ⚙️ Backend → Render (private)
 - ☁️ Media → Cloudinary
+- 🗂 SQL → Supabase
 
 ## 🛡️ Bảo mật
 
