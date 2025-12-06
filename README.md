@@ -1,6 +1,6 @@
 # Chisaki Umi
 <p align="center">
-  <img src="./favicon/logo.png" />
+  <img src="chat/favicon/logo.png" />
 </p>
 
 Là một dự án được thực hiện bởi Nguyễn Minh Ngọc, sau khi có vấn đề xảy ra với việc đăng bài trên confession của trường theo học. 
