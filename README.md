@@ -1,4 +1,7 @@
 # Chisaki Umi
+<p align="center">
+  <img src="./favicon/logo.png" />
+</p>
 
 Là một dự án được thực hiện bởi Nguyễn Minh Ngọc, sau khi có vấn đề xảy ra với việc đăng bài trên confession của trường theo học. 
   Đầu tiên, xin cảm ơn admin confession trường đã quyết định không đăng bài của mình, nhờ thế nên mình mới quyết định làm dự án này với mong muốn học sinh có thể tự do nói lên tiếng lòng của mình mà không bị người khác kiểm duyệt. 
