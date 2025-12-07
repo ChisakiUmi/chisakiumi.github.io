@@ -116,7 +116,7 @@ function saveNews(newsItem) {
 function loadNews() {
     const currentDate = new Date();
 
-    fetch('https://backend-oik0.onrender.com/api/news')
+    fetch('https://backend-1-m5tj.onrender.com/api/news')
         .then(response => response.json())
         .then(data => {
 
